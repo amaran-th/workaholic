@@ -1,4 +1,5 @@
 import SessionInitializer from "@/features/auth/components/SessionInitializer";
+import Header from "@/features/shared/components/Header";
 import QueryProvider from "@/providers/QueryProvider";
 import StateProvider from "@/providers/StateProvider";
 import type { Metadata } from "next";
@@ -31,6 +32,7 @@ export default function RootLayout({
         <QueryProvider>
           <StateProvider>
             <SessionInitializer />
+            <Header />
             {children}
           </StateProvider>
         </QueryProvider>

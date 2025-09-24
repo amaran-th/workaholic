@@ -2,9 +2,8 @@ import SignupForm from "@/features/auth/components/SignupForm";
 
 export default function LoginPage() {
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="p-6 border rounded-lg shadow bg-white">
-        <h1 className="text-xl font-bold mb-4">회원가입</h1>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
         <SignupForm />
       </div>
     </div>
