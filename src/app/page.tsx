@@ -1,15 +1,23 @@
 "use client";
 
-import LogoutButton from "@/features/auth/components/LogoutButton";
 import { withProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 
-function DashboardPage() {
+import TaskMatrix from "@/features/task/matrix/TaskMatrix";
+import { useEffect, useState } from "react";
+
+function MatrixPage() {
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    setHeight(window.innerHeight - 48);
+  }, []);
+
+  if (!height) return null;
   return (
-    <div>
-      대시보드 페이지
-      <LogoutButton />
+    <div style={{ height }}>
+      <TaskMatrix />
     </div>
   );
 }
 
-export default withProtectedRoute(DashboardPage);
+export default withProtectedRoute(MatrixPage);

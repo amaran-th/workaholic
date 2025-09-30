@@ -2,6 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
+import { logoutMemberApi } from "../auth-api";
 import { sessionAtom } from "../store/sessionAtom";
 
 export default function LogoutButton() {
@@ -10,15 +11,9 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/auth/logout", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        // Atom 등 상태 초기화 후 로그인 페이지로 이동
-        setSession(null);
-        router.push("/login");
-      } else {
-        alert(data.error);
-      }
+      await logoutMemberApi();
+      setSession(null);
+      router.push("/login");
     } catch (err) {
       console.error(err);
     }

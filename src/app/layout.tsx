@@ -2,6 +2,7 @@ import SessionInitializer from "@/features/auth/components/SessionInitializer";
 import Header from "@/features/shared/components/Header";
 import QueryProvider from "@/providers/QueryProvider";
 import StateProvider from "@/providers/StateProvider";
+import { ReactFlowProvider } from "@xyflow/react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -27,15 +28,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`font-nanum antialiased`}>
-        <QueryProvider>
-          <StateProvider>
-            <SessionInitializer />
-            <Header />
-            {children}
-          </StateProvider>
-        </QueryProvider>
+        <ReactFlowProvider>
+          <QueryProvider>
+            <StateProvider>
+              <SessionInitializer />
+              <Header />
+              {children}
+            </StateProvider>
+          </QueryProvider>
+        </ReactFlowProvider>
       </body>
     </html>
   );

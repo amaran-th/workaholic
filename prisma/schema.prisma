@@ -14,8 +14,64 @@ model Member {
   name      String?
   centerX   Float    @default(0)
   centerY   Float    @default(0)
+  left      Float    @default(0)
+  right     Float    @default(0)
+  top       Float    @default(0)
+  bottom    Float    @default(0)
   bio       String?  // 원하면 추가
   avatarUrl String?  // 원하면 추가
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  categories Category[]
+  tasks      Task[]
+}
+
+model Category {
+  id       String  @id @default(uuid())
+  name     String
+  color    String
+  member   Member  @relation(fields: [memberId], references: [id])
+  memberId String
+  tasks    Task[]
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  no          Int
+  content     String
+  memo        String?
+  status      TaskStatus @default(PENDING)
+  startDate   DateTime?
+  endDate     DateTime?
+  dueDate     DateTime?
+  comment     String?
+  positionX   Float
+  positionY   Float
+
+  // 관계
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  member     Member   @relation(fields: [memberId], references: [id])
+  memberId   String
+
+  parentTask   Task?   @relation("SubTasks", fields: [parentTaskId], references: [id])
+  parentTaskId String?
+  subTasks     Task[]  @relation("SubTasks")
+
+  doStamps   DoStamp[]
+}
+
+model DoStamp {
+  id        String   @id @default(uuid())
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  createdAt DateTime @default(now())
+}
+
+enum TaskStatus {
+  PENDING
+  DOING
+  DONE
 }

@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { loginMemberApi } from "../auth-api";
 import { sessionAtom } from "../store/sessionAtom";
-import { MemberSession } from "../types/auth";
 
 export default function LoginForm({
   className,
@@ -23,17 +23,9 @@ export default function LoginForm({
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const data = (await res.json()) as MemberSession | { error: string };
-
-      if ("error" in data) throw new Error(data.error);
-
-      setSession(data);
+      const { session } = await loginMemberApi({ email, password });
+      console.log(session);
+      setSession(session);
       router.push("/");
     } catch (err) {
       if (err instanceof Error) alert(err.message);
