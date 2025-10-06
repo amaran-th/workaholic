@@ -5,70 +5,101 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      memberId,
       content,
-      categoryId,
-      parentTaskId,
+      memo,
       positionX,
       positionY,
+      dueDate,
+      memberId,
+      categoryId,
+      parentTaskId,
+      sprintId,
     } = body;
 
-    if (!memberId || !content || !categoryId) {
-      return NextResponse.json(
-        { error: "memberId, content, categoryId 필요" },
-        { status: 400 }
-      );
-    }
-
-    // Task 번호 자동 생성
-    const maxNoTask = await prisma.task.findFirst({
-      where: { memberId, categoryId },
-      orderBy: { no: "desc" },
+    // member별로 no를 자동 증가
+    const maxNo = await prisma.task.aggregate({
+      _max: { no: true },
+      where: { memberId },
     });
-    const no = maxNoTask ? maxNoTask.no + 1 : 1;
 
-    const task = await prisma.task.create({
+    const nextNo = (maxNo._max.no ?? 0) + 1;
+
+    const newTask = await prisma.task.create({
       data: {
-        no,
+        no: nextNo,
         content,
+        memo,
+        positionX,
+        positionY,
+        dueDate,
         memberId,
         categoryId,
         parentTaskId,
-        positionX: positionX ?? 0,
-        positionY: positionY ?? 0,
+        sprintId,
       },
     });
 
-    return NextResponse.json(task);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "알 수 없는 에러";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(newTask);
+  } catch (error) {
+    console.error(error);
+    return new NextResponse("Failed to create task", { status: 500 });
   }
 }
-
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const memberId = req.nextUrl.searchParams.get("memberId");
-    if (!memberId) {
-      return NextResponse.json({ error: "memberId 필요" }, { status: 400 });
+    const { searchParams } = new URL(req.url);
+
+    const memberId = searchParams.get("memberId");
+    const categoryId = searchParams.get("categoryId");
+    const sprintId = searchParams.get("sprintId");
+
+    const from = searchParams.get("from"); // 기간 시작 (YYYY-MM-DD)
+    const to = searchParams.get("to"); // 기간 끝 (YYYY-MM-DD)
+    const createdAfter = searchParams.get("createdAfter"); // 생성일 기준 필터
+
+    const where: any = {};
+
+    if (memberId) where.memberId = memberId;
+    if (categoryId) where.categoryId = categoryId;
+    if (sprintId) where.sprintId = sprintId;
+
+    // ✅ createdAt 필터: 특정 날짜 이후
+    if (createdAfter) {
+      where.createdAt = { lte: new Date(createdAfter) };
+    }
+
+    // ✅ from~to: 기간 교차 필터링 (겹치는 모든 task 포함)
+    if (from && to) {
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+
+      // task 기간이 [from, to]와 겹치는 경우
+      where.AND = [
+        { OR: [{ startDate: { lte: toDate } }, { startDate: null }] },
+        { OR: [{ endDate: { gte: fromDate } }, { endDate: null }] },
+      ];
     }
 
     const tasks = await prisma.task.findMany({
-      where: { memberId },
-      orderBy: { no: "asc" },
+      where,
       include: {
+        category: {
+          select: { id: true, name: true, color: true },
+        },
+        sprint: true,
         parentTask: {
           select: { id: true, content: true },
         },
         doStamps: true,
       },
+      orderBy: { createdAt: "asc" },
     });
 
     return NextResponse.json(tasks);
   } catch (error) {
-    console.error(error);
+    console.error("[GET /api/tasks] ❌", error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: "Failed to fetch tasks" },
       { status: 500 }
     );
   }

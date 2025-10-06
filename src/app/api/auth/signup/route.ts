@@ -46,17 +46,6 @@ export async function POST(req: NextRequest) {
       right: 1000,
       top: -1000,
       bottom: 1000,
-      categories: {
-        create: [
-          {
-            name: "기본 카테고리",
-            color: "#FFFFFF",
-          },
-        ],
-      },
-    },
-    include: {
-      categories: true, // 방금 생성된 기본 카테고리도 반환
     },
   });
 

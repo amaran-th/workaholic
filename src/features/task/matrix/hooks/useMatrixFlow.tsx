@@ -9,14 +9,17 @@ import { MemberPosition } from "@/features/member/types/member";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Edge, Node } from "@xyflow/react";
 import { useAtom } from "jotai";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
-import { EdgeType, NodeType, TaskWithRelations } from "../../types/task";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { patchTaskApi, useGetTasksQuery } from "../../task-api";
+import { EdgeType, NodeType, PatchTaskRequest } from "../../types/task";
+import { taskFilterAtom } from "../store/matrixAtom";
 
 export default function useMatrixFlow(
   setNodes: Dispatch<SetStateAction<Node[]>>,
   setEdges: Dispatch<SetStateAction<Edge[]>>
 ) {
   const [session] = useAtom(sessionAtom);
+  const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
   const [localCenterPosition, setLocalCenterPosition] =
     useState<MemberPosition>({
@@ -38,89 +41,27 @@ export default function useMatrixFlow(
       setLocalCenterPosition(centerPosition);
     }
   }, [centerPosition]);
-  // const {
-  //   data: tasks,
-  //   isLoading,
-  //   error,
-  // } = useGetTasksQuery(
-  //   { memberId: session!.user.id! },
-  //   { enabled: !!session?.user?.id }
-  // );
-  const tasks: TaskWithRelations[] = [
-    {
-      id: "1",
-      no: 1,
-      content: "프로젝트 구조 설계",
-      memo: "폴더 구조와 도메인 구분 정리",
-      status: "DOING",
-      startDate: "2025-09-28T09:00:00.000Z",
-      endDate: null,
-      dueDate: "2025-10-01T18:00:00.000Z",
-      comment: null,
-      positionX: 100,
-      positionY: 50,
-      categoryId: "cat1",
-      memberId: "member1",
-      parentTask: null,
-      doStamps: [
-        { id: "ds1", taskId: "1", createdAt: "2025-09-28T10:00:00.000Z" },
-      ],
-    },
-    {
-      id: "2",
-      no: 2,
-      content: "회원가입/로그인 구현",
-      memo: "Supabase Auth + Prisma 연결",
-      status: "PENDING",
-      startDate: null,
-      endDate: null,
-      dueDate: "2025-09-29T18:00:00.000Z",
-      comment: null,
-      positionX: 300,
-      positionY: 50,
-      categoryId: "cat1",
-      memberId: "member1",
-      parentTask: null,
-      doStamps: [],
-    },
-    {
-      id: "3",
-      no: 3,
-      content: "Task API 구현",
-      memo: "GET/POST /api/task",
-      status: "PENDING",
-      startDate: null,
-      endDate: null,
-      dueDate: "2025-09-30T18:00:00.000Z",
-      comment: null,
-      positionX: 500,
-      positionY: 50,
-      categoryId: "cat1",
-      memberId: "member1",
-      parentTask: { id: "2", content: "회원가입/로그인 구현" },
-      doStamps: [],
-    },
-    {
-      id: "4",
-      no: 4,
-      content: "React Flow 캔버스 연결",
-      memo: "노드 생성 + 위치 저장 + parent 표시",
-      status: "PENDING",
-      startDate: null,
-      endDate: null,
-      dueDate: "2025-10-01T18:00:00.000Z",
-      comment: null,
-      positionX: 700,
-      positionY: 50,
-      categoryId: "cat1",
-      memberId: "member1",
-      parentTask: { id: "3", content: "Task API 구현" },
-      doStamps: [],
-    },
-  ];
+  const { data: tasks } = useGetTasksQuery(taskFilter, {
+    enabled: !!session?.user?.id,
+  });
 
   const [currentNodesFetching, setCurrentNodesFetching] =
     useState<boolean>(true);
+
+  const patchTask = useMutation({
+    mutationFn: ({
+      taskId,
+      data,
+    }: {
+      taskId: string;
+      data: PatchTaskRequest;
+    }) => patchTaskApi({ taskId, data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", taskFilter],
+      });
+    },
+  });
 
   const updatePosition = useMutation({
     mutationFn: (vars: {
@@ -140,23 +81,6 @@ export default function useMatrixFlow(
     },
   });
 
-  const centerPositionStable = useMemo(
-    () => centerPosition,
-    [
-      localCenterPosition?.centerX,
-      localCenterPosition?.centerY,
-      localCenterPosition?.left,
-      localCenterPosition?.right,
-      localCenterPosition?.top,
-      localCenterPosition?.bottom,
-    ]
-  );
-
-  const tasksStable = useMemo(
-    () => tasks,
-    [tasks.map((t) => t.id + t.positionX + t.positionY).join(",")]
-  );
-
   useEffect(() => {
     if (!tasks || !localCenterPosition) {
       return;
@@ -174,10 +98,10 @@ export default function useMatrixFlow(
           width: localCenterPosition.centerX - localCenterPosition.left,
           height: localCenterPosition.centerY - localCenterPosition.top,
         },
+        className: "quadrant-node",
         type: "quadrant",
         deletable: false,
         draggable: false,
-        selectable: false,
       },
       {
         id: "q2",
@@ -185,16 +109,15 @@ export default function useMatrixFlow(
           x: localCenterPosition.centerX,
           y: localCenterPosition.top,
         },
-
         data: {
           bgcolor: "#FF9999",
           width: localCenterPosition.right - localCenterPosition.centerX,
           height: localCenterPosition.centerY - localCenterPosition.top,
         },
+        className: "quadrant-node",
         type: "quadrant",
         deletable: false,
         draggable: false,
-        selectable: false,
       },
       {
         id: "q3",
@@ -207,10 +130,10 @@ export default function useMatrixFlow(
           width: localCenterPosition.centerX - localCenterPosition.left,
           height: localCenterPosition.bottom - localCenterPosition.centerY,
         },
+        className: "quadrant-node",
         type: "quadrant",
         deletable: false,
         draggable: false,
-        selectable: false,
       },
       {
         id: "q4",
@@ -223,10 +146,10 @@ export default function useMatrixFlow(
           width: localCenterPosition.right - localCenterPosition.centerX,
           height: localCenterPosition.bottom - localCenterPosition.centerY,
         },
+        className: "quadrant-node",
         type: "quadrant",
         deletable: false,
         draggable: false,
-        selectable: false,
       },
       {
         id: "left",
@@ -369,10 +292,11 @@ export default function useMatrixFlow(
       } as Edge);
     };
 
-    for (const { id, positionX: x, positionY: y, ...rest } of tasks) {
+    for (const task of tasks) {
+      const { id, positionX: x, positionY: y } = task;
       addNode({
         id,
-        data: rest,
+        data: task,
         type: "task",
         position: { x, y },
       });
@@ -380,7 +304,7 @@ export default function useMatrixFlow(
 
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [tasksStable, centerPositionStable]);
+  }, [tasks, centerPosition]);
 
   useEffect(() => {
     const { centerX, centerY, left, right, top, bottom } = localCenterPosition;
@@ -484,6 +408,7 @@ export default function useMatrixFlow(
       })
     );
   }, [localCenterPosition, setNodes]);
+
   const handleNodeDrag = (event: React.MouseEvent, node: Node) => {
     if (node.id === "center") {
       setLocalCenterPosition((prev) => ({
@@ -526,6 +451,15 @@ export default function useMatrixFlow(
       updatePosition.mutate({
         memberId: session!.user.id!,
         ...localCenterPosition,
+      });
+    } else if (node.type === "task") {
+      console.log("업무 드래그 종료:", node.position);
+      patchTask.mutate({
+        taskId: node.id,
+        data: {
+          positionX: node.position.x,
+          positionY: node.position.y,
+        },
       });
     }
   };

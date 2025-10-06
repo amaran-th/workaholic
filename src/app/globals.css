@@ -12,6 +12,7 @@
 @theme {
   --color-text: #493628;
   --color-sub-text: #797979;
+  --color-placeholder: #bcbcbc;
   --color-primary: #000000;
   --color-secondary: #202020;
   --color-divider: #f0e4d3;
@@ -19,6 +20,7 @@
   --color-secondary: #a46262;
   --color-success: #5ac069;
   --color-error: #ed5454;
+  --color-progress: #3caac3;
   --font-nanum: "NanumSquareNeo", Arial, Helvetica, sans-serif;
 }
 
@@ -140,4 +142,9 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.react-flow__node.quadrant-node,
+.react-flow__node.quadrant-node.react-flow__node-selected {
+  @apply !z-0; /* Tailwind z-index 0 */
 }

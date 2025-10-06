@@ -12,7 +12,6 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
-  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import QuadrantNode from "./nodes/QuadrantNode";
@@ -31,7 +30,7 @@ const edgeTypes = {
 function TaskMatrix() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { getZoom } = useReactFlow();
+
   const { handleNodeDrag, handleNodeDragStop } = useMatrixFlow(
     setNodes,
     setEdges
