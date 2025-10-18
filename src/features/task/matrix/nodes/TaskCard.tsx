@@ -51,6 +51,7 @@ function TaskCard({
       return <RefreshCw className="bg-progress text-white rounded-full p-1" />;
     return <></>;
   }, [isCompleted, isDoing]);
+
   return (
     <Card
       className="w-[200px] min-h-[150px] rounded-t-none p-3 gap-1"
@@ -58,7 +59,7 @@ function TaskCard({
         backgroundColor: colorMap[data.category?.color ?? "white"].bg,
       }}
     >
-      {!!data.dueDate && !isCompleted && (
+      {!!data.dueDate && !isCompleted &&formatDDayString(new Date(), data.dueDate)&& (
         <span className="absolute -top-6 left-0 flex gap-1 bg-primary text-white rounded-md rounded-b-none text-xs font-bold p-1 pr-2 items-center">
           <Timer className="size-4" />
           {formatDDayString(new Date(), data.dueDate)}
