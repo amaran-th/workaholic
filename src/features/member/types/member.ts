@@ -6,3 +6,10 @@ export type MemberPosition = {
   top: number;
   bottom: number;
 };
+
+export type MemberInfo = {
+  email: string;
+  name: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+};
