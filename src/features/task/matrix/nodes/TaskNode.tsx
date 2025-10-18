@@ -61,7 +61,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const queryClient = useQueryClient();
   const [memo, setMemo] = useState<string>(data.memo ?? "");
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
-  console.log(data.dueDate, dueDate);
+  console.log(dueDate?.slice(11, 19));
   const patchTask = useMutation({
     mutationFn: ({
       taskId,
@@ -206,7 +206,11 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </Button>
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuSub>
+        <ContextMenuSub onOpenChange={(open) => {
+          if (open) {
+            setDueDate(data.dueDate)
+          }
+        }}>
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
@@ -226,7 +230,6 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 mode="single"
                 selected={dueDate ? new Date(dueDate) : undefined}
                 onSelect={(newValue) => {
-                  console.log(dueDate);
                   setDueDate((prev) => {
                     if (!newValue) return prev;
                     if (prev) {
@@ -244,7 +247,13 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 type="time"
                 id="time-picker"
                 step="1"
-                defaultValue="10:30:00"
+                value={dueDate ? new Date(dueDate).toLocaleTimeString("ko-KR", {
+                  hour12: false,
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  timeZone: "Asia/Seoul",
+                }) : "00:00:00"}
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                 onChange={(event) => {
                   console.log(event.target.value);
