@@ -5,6 +5,7 @@ import {
   Dispatch,
   SetStateAction,
   TextareaHTMLAttributes,
+  useEffect,
   useRef,
 } from "react";
 
@@ -35,12 +36,19 @@ function FlexibleTextArea({
       });
     }
   };
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "0px";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, []); // 마운트 시 한 번만 실행
   return (
     <textarea
       ref={textareaRef}
       onChange={handleChange}
       className={cn(
         "min-w-0 w-full resize-none overflow-hidden focus-visible:outline-0 placeholder:text-placeholder",
+        "min-h-0 h-auto",
         className
       )}
       value={text}
