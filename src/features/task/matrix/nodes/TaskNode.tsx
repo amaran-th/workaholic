@@ -206,11 +206,13 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </Button>
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuSub onOpenChange={(open) => {
-          if (open) {
-            setDueDate(data.dueDate)
-          }
-        }}>
+        <ContextMenuSub
+          onOpenChange={(open) => {
+            if (open) {
+              setDueDate(data.dueDate);
+            }
+          }}
+        >
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
@@ -247,13 +249,17 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 type="time"
                 id="time-picker"
                 step="1"
-                value={dueDate ? new Date(dueDate).toLocaleTimeString("ko-KR", {
-                  hour12: false,
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  timeZone: "Asia/Seoul",
-                }) : "00:00:00"}
+                value={
+                  dueDate
+                    ? new Date(dueDate).toLocaleTimeString("ko-KR", {
+                        hour12: false,
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        timeZone: "Asia/Seoul",
+                      })
+                    : "00:00:00"
+                }
                 className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
                 onChange={(event) => {
                   console.log(event.target.value);

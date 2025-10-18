@@ -159,7 +159,7 @@ export default function useMatrixFlow(
         },
         data: {
           type: "horizon",
-          size: localCenterPosition.bottom - localCenterPosition.top,
+          height: localCenterPosition.bottom - localCenterPosition.top,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -172,7 +172,7 @@ export default function useMatrixFlow(
         },
         data: {
           type: "horizon",
-          size: localCenterPosition.bottom - localCenterPosition.top,
+          height: localCenterPosition.bottom - localCenterPosition.top,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -185,7 +185,7 @@ export default function useMatrixFlow(
         },
         data: {
           type: "vertical",
-          size: localCenterPosition.right - localCenterPosition.left,
+          width: localCenterPosition.right - localCenterPosition.left,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -198,7 +198,55 @@ export default function useMatrixFlow(
         },
         data: {
           type: "vertical",
-          size: localCenterPosition.right - localCenterPosition.left,
+          width: localCenterPosition.right - localCenterPosition.left,
+        },
+        type: "axisEndPoint",
+        deletable: false,
+      },
+      {
+        id: "top-left",
+        position: {
+          x: localCenterPosition.left,
+          y: localCenterPosition.top,
+        },
+        data: {
+          type: "top-left",
+        },
+        type: "axisEndPoint",
+        deletable: false,
+      },
+      {
+        id: "top-right",
+        position: {
+          x: localCenterPosition.right,
+          y: localCenterPosition.top,
+        },
+        data: {
+          type: "top-right",
+        },
+        type: "axisEndPoint",
+        deletable: false,
+      },
+      {
+        id: "bottom-left",
+        position: {
+          x: localCenterPosition.left,
+          y: localCenterPosition.bottom,
+        },
+        data: {
+          type: "bottom-left",
+        },
+        type: "axisEndPoint",
+        deletable: false,
+      },
+      {
+        id: "bottom-right",
+        position: {
+          x: localCenterPosition.right,
+          y: localCenterPosition.bottom,
+        },
+        data: {
+          type: "bottom-right",
         },
         type: "axisEndPoint",
         deletable: false,
@@ -370,7 +418,7 @@ export default function useMatrixFlow(
             position: { x: left, y: top },
             data: {
               ...n.data,
-              size: bottom - top,
+              height: bottom - top,
             },
           };
         }
@@ -380,7 +428,7 @@ export default function useMatrixFlow(
             position: { x: right, y: top },
             data: {
               ...n.data,
-              size: bottom - top,
+              height: bottom - top,
             },
           };
         }
@@ -390,7 +438,7 @@ export default function useMatrixFlow(
             position: { x: left, y: top },
             data: {
               ...n.data,
-              size: right - left,
+              width: right - left,
             },
           };
         }
@@ -400,8 +448,32 @@ export default function useMatrixFlow(
             position: { x: left, y: bottom },
             data: {
               ...n.data,
-              size: right - left,
+              width: right - left,
             },
+          };
+        }
+        if (n.id === "top-left") {
+          return {
+            ...n,
+            position: { x: left, y: top },
+          };
+        }
+        if (n.id === "top-right") {
+          return {
+            ...n,
+            position: { x: right, y: top },
+          };
+        }
+        if (n.id === "bottom-left") {
+          return {
+            ...n,
+            position: { x: left, y: bottom },
+          };
+        }
+        if (n.id === "bottom-right") {
+          return {
+            ...n,
+            position: { x: right, y: bottom },
           };
         }
         return n;
@@ -441,10 +513,50 @@ export default function useMatrixFlow(
         bottom: Math.max(node.position.y, prev.centerY),
       }));
     }
+    if (node.id === "top-left") {
+      setLocalCenterPosition((prev) => ({
+        ...prev,
+        top: Math.min(node.position.y, prev.centerY),
+        left: Math.min(node.position.x, prev.centerX),
+      }));
+    }
+    if (node.id === "top-right") {
+      setLocalCenterPosition((prev) => ({
+        ...prev,
+        top: Math.min(node.position.y, prev.centerY),
+        right: Math.max(node.position.x, prev.centerX),
+      }));
+    }
+    if (node.id === "bottom-left") {
+      setLocalCenterPosition((prev) => ({
+        ...prev,
+        bottom: Math.max(node.position.y, prev.centerY),
+        left: Math.min(node.position.x, prev.centerX),
+      }));
+    }
+    if (node.id === "bottom-right") {
+      setLocalCenterPosition((prev) => ({
+        ...prev,
+        bottom: Math.max(node.position.y, prev.centerY),
+        right: Math.max(node.position.x, prev.centerX),
+      }));
+    }
   };
 
   const handleNodeDragStop = async (event: React.MouseEvent, node: Node) => {
-    if (["center", "left", "right", "top", "bottom"].includes(node.id)) {
+    if (
+      [
+        "center",
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+      ].includes(node.id)
+    ) {
       console.log("센터 드래그 종료:", node.position);
 
       // 1) API 호출해서 새 좌표 저장
