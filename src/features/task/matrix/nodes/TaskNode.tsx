@@ -115,12 +115,9 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     },
   });
 
-  const { data: categories } = useGetCategoriesQuery(
-    { memberId: session?.user.id ?? "" },
-    {
-      enabled: !!session?.user.id,
-    }
-  );
+  const { data: categories } = useGetCategoriesQuery({
+    memberId: session?.user.id ?? "",
+  });
 
   const isDoing = useMemo(
     () => data.doStamps.some((stamp) => isSameDay(stamp.createdAt)),
@@ -177,7 +174,8 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 params: { date: formatDateTimeString(selectedDate) },
               });
             }}
-            variant={isDoing ? "progress" : "outline"}
+            color="progress"
+            variant={isDoing ? "default" : "outline"}
             disabled={isCompleted}
           >
             <RefreshCw
@@ -194,7 +192,8 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 params: { date: formatDateTimeString(selectedDate) },
               });
             }}
-            variant={isCompleted ? "success" : "outline"}
+            color="success"
+            variant={isCompleted ? "default" : "outline"}
             disabled={!isDoing}
           >
             <Check

@@ -1,4 +1,5 @@
 import { Card, CardDescription } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
 import { colorMap } from "@/lib/data";
 import { formatDDayString } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -59,12 +60,14 @@ function TaskCard({
         backgroundColor: colorMap[data.category?.color ?? "white"].bg,
       }}
     >
-      {!!data.dueDate && !isCompleted &&formatDDayString(new Date(), data.dueDate)&& (
-        <span className="absolute -top-6 left-0 flex gap-1 bg-primary text-white rounded-md rounded-b-none text-xs font-bold p-1 pr-2 items-center">
-          <Timer className="size-4" />
-          {formatDDayString(new Date(), data.dueDate)}
-        </span>
-      )}
+      {!!data.dueDate &&
+        !isCompleted &&
+        formatDDayString(new Date(), data.dueDate) && (
+          <span className="absolute -top-6 left-0 flex gap-1 bg-primary text-white rounded-md rounded-b-none text-xs font-bold p-1 pr-2 items-center">
+            <Timer className="size-4" />
+            {formatDDayString(new Date(), data.dueDate)}
+          </span>
+        )}
       {!!data.parentTask && (
         <CardDescription className="flex items-end text-xs gap-0.5">
           {data.parentTask.content}
@@ -93,15 +96,11 @@ function TaskCard({
 
       <div className="flex gap-1 items-center justify-between">
         {data.category ? (
-          <span
-            className="px-2 rounded-full py-0.5 text-[8px]"
-            style={{
-              backgroundColor: colorMap[data.category.color].sub,
-              color: colorMap[data.category.color].primary,
-            }}
-          >
-            {data.category.name}
-          </span>
+          <Chip
+            label={data.category.name}
+            customColor={data.category.color}
+            size="sm"
+          />
         ) : (
           <div />
         )}
