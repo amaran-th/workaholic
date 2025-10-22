@@ -28,7 +28,7 @@ function TaskCard({
 }) {
   const queryClient = useQueryClient();
   const [taskFilter] = useAtom(taskFilterAtom);
-  const [text, setText] = useState(data.content);
+  const [text, setText] = useState<string>(data.content);
 
   const patchTask = useMutation({
     mutationFn: ({

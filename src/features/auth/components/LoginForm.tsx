@@ -14,8 +14,8 @@ export default function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [, setSession] = useAtom(sessionAtom);
   const router = useRouter();
 
