@@ -2,12 +2,12 @@
 
 import { withProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import MyCategory from "@/features/member/components/MyCategory";
-import Profile from "@/features/member/components/Profile";
+import MyProfile from "@/features/member/components/MyProfile";
 
 function MyPage() {
   return (
-    <div>
-      <Profile />
+    <div className="flex flex-col gap-8 items-center py-16">
+      <MyProfile />
       <MyCategory />
     </div>
   );
