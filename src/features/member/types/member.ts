@@ -13,3 +13,9 @@ export type MemberInfo = {
   bio: string | null;
   avatarUrl: string | null;
 };
+
+export type MemberInfoPatchRequest = {
+  name: string;
+  bio: string;
+  avatarUrl: string;
+};

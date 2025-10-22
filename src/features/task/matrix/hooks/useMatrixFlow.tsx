@@ -2,7 +2,7 @@
 
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import {
-  updatePositionApi,
+  patchPositionApi,
   useGetCenterPositionQuery,
 } from "@/features/member/member-api";
 import { MemberPosition } from "@/features/member/types/member";
@@ -72,7 +72,7 @@ export default function useMatrixFlow(
       bottom: number;
       centerX: number;
       centerY: number;
-    }) => updatePositionApi(vars),
+    }) => patchPositionApi(vars),
     onSuccess: () => {
       // 성공 시 캐시 무효화 → centerPosition 재조회
       queryClient.invalidateQueries({
