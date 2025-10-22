@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { toast } from "react-toastify";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -92,4 +93,8 @@ export const isSameDay = (date: string) => {
     created.getMonth() === now.getMonth() &&
     created.getDate() === now.getDate()
   );
+};
+
+export const notifyNotSupportedFeature = () => {
+  toast("아직 제공되지 않는 기능이에요");
 };

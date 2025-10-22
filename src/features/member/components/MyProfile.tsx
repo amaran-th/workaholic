@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
+import { notifyNotSupportedFeature } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Loader2, Plus } from "lucide-react";
@@ -110,7 +111,10 @@ function MyProfile() {
                 height="200"
                 className="rounded-full"
               />
-              <Button className="absolute bottom-0 right-0">
+              <Button
+                className="absolute bottom-0 right-0"
+                onClick={notifyNotSupportedFeature}
+              >
                 <Plus />
               </Button>
             </div>
