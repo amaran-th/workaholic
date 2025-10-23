@@ -113,7 +113,9 @@ function MyProfile() {
               />
               <Button
                 className="absolute bottom-0 right-0"
+                size="icon-lg"
                 onClick={notifyNotSupportedFeature}
+                rounded
               >
                 <Plus />
               </Button>

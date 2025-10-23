@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -19,10 +19,11 @@ const buttonVariants = cva(
       },
       color: {
         primary: "",
-        secondary: "",
-        progress: "",
-        success: "",
-        error: "",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/90",
+        progress: "bg-progress text-white hover:bg-progress/90",
+        success: "bg-success text-white hover:bg-success/90",
+        error: "bg-error text-white hover:bg-error/90",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -39,33 +40,61 @@ const buttonVariants = cva(
       size: "default",
     },
     compoundVariants: [
+      {
+        variant: "default",
+        color: "primary",
+        className: "bg-primary text-primary-foreground hover:bg-primary/90",
+      },
+      {
+        variant: "default",
+        color: "secondary",
+        className:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/90",
+      },
+      {
+        variant: "default",
+        color: "progress",
+        className: "bg-progress text-white hover:bg-progress/90",
+      },
+      {
+        variant: "default",
+        color: "success",
+        className: "bg-success text-white hover:bg-success/90",
+      },
+      {
+        variant: "default",
+        color: "error",
+        className: "bg-error text-white hover:bg-error/90",
+      },
       // Outline + Color
       {
         variant: "outline",
         color: "primary",
-        className: "border-primary text-primary-foreground hover:bg-primary/10",
+        className:
+          "border-primary text-primary bg-transparent hover:bg-primary/10",
       },
       {
         variant: "outline",
         color: "secondary",
         className:
-          "border-secondary text-secondary-foreground hover:bg-secondary/10",
+          "border-secondary text-secondary bg-transparent hover:bg-secondary/10",
       },
       {
         variant: "outline",
         color: "progress",
         className:
-          "border-progress text-progress-foreground hover:bg-progress/10",
+          "border-progress text-progress bg-transparent hover:bg-progress/10",
       },
       {
         variant: "outline",
         color: "success",
-        className: "border-success text-success-foreground hover:bg-success/10",
+        className:
+          "border-success text-success bg-transparent hover:bg-success/10",
       },
       {
         variant: "outline",
         color: "error",
-        className: "border-error text-error-foreground hover:bg-error/10",
+        className: "border-error text-error bg-transparent hover:bg-error/10",
       },
 
       // Ghost + Color
@@ -95,7 +124,7 @@ const buttonVariants = cva(
         className: "text-error-foreground hover:bg-error/10",
       },
 
-      // Destructive + Color (필요하면 override 가능)
+      // Destructive + Color
       {
         variant: "destructive",
         color: "primary",
@@ -158,17 +187,22 @@ function Button({
   size,
   color,
   asChild = false,
+  rounded = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    rounded?: boolean;
   }) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, color, className }))}
+      className={cn(
+        buttonVariants({ variant, size, color, className }),
+        rounded && "rounded-full"
+      )}
       {...props}
     />
   );
