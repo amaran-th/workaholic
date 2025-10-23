@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, formatKoreanDate } from "@/lib/utils";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -10,6 +10,8 @@ import {
 import * as React from "react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
+import { Label } from "./label";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 function Calendar({
   className,
@@ -212,4 +214,59 @@ function CalendarDayButton({
   );
 }
 
-export { Calendar, CalendarDayButton };
+interface CalendarSelectProps {
+  label?: string;
+  readonly?: boolean;
+  date: string | null;
+  onSelect: (newValue: Date | undefined) => void;
+}
+
+function CalendarSelect({
+  label,
+  readonly,
+  date,
+  onSelect,
+}: CalendarSelectProps) {
+  const [open, setOpen] = React.useState<boolean>(false);
+
+  return (
+    <div className="flex flex-col gap-1">
+      {!!label && (
+        <Label htmlFor="date" className="text-xs">
+          {label}
+        </Label>
+      )}
+      {readonly ? (
+        <p className="text-xs w-36 text-secondary leading-8">
+          {date ? formatKoreanDate(date) : "미정"}
+        </p>
+      ) : (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              color="secondary"
+              variant="outline"
+              size="sm"
+              id="date"
+              className="w-36 text-xs justify-between font-normal"
+            >
+              {date ? formatKoreanDate(date) : "날짜 선택"}
+              <ChevronDownIcon />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date ? new Date(date) : undefined}
+              onSelect={onSelect}
+              className="rounded-md border shadow-sm"
+              captionLayout="dropdown"
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+    </div>
+  );
+}
+
+export { Calendar, CalendarDayButton, CalendarSelect };

@@ -1,20 +1,10 @@
+import { Category } from "@/features/category/types/category";
+import { Sprint } from "@/features/sprint/types/sprint";
+
 export type DoStamp = {
   id: string;
   taskId: string;
   createdAt: string; // ISO string
-};
-
-export type Sprint = {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-};
-
-export type TaskCategory = {
-  id: string;
-  name: string;
-  color: "white" | "blue" | "green";
 };
 
 export type TaskStatus = "PENDING" | "DOING" | "DONE";
@@ -30,7 +20,7 @@ export type TaskWithRelations = {
   comment: string | null;
   positionX: number;
   positionY: number;
-  category: TaskCategory;
+  category: Category;
   memberId: string;
   parentTask: { id: string; content: string } | null;
   sprint: Sprint | null;
@@ -66,7 +56,7 @@ export type PatchTaskRequest = Partial<{
   memo: string;
   positionX: number | null;
   positionY: number | null;
-  dueDate: Date|null;
+  dueDate: Date | null;
   categoryId: string | null;
   parentTaskId: string | null;
   sprintId: string | null;

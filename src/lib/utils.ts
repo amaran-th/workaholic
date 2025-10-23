@@ -95,6 +95,14 @@ export const isSameDay = (date: string) => {
   );
 };
 
+export const formatKoreanDate = (date: string | null) => {
+  if (typeof window === "undefined") return ""; // SSR 회피
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("ko-KR", {
+    timeZone: "Asia/Seoul",
+  });
+};
+
 export const notifyNotSupportedFeature = () => {
   toast("아직 제공되지 않는 기능이에요");
 };

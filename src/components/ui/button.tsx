@@ -101,7 +101,7 @@ const buttonVariants = cva(
       {
         variant: "ghost",
         color: "primary",
-        className: "text-primary-foreground hover:bg-primary/10",
+        className: "hover:bg-accent dark:hover:bg-accent/50",
       },
       {
         variant: "ghost",
