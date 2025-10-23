@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +35,9 @@ export default function MyButton() {
   };
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>MY</DropdownMenuTrigger>
+      <DropdownMenuTrigger>
+        <Button>MY</Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => router.push("/my")}>
           마이페이지
