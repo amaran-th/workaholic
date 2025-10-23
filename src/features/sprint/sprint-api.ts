@@ -1,14 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Sprint } from "../task/types/task";
-import { PostSprintRequest } from "./types/sprint";
+import { PostSprintRequest, Sprint } from "./types/sprint";
 
 const API_BASE = "/api/sprint";
 
 const getSprintApi = async (params: {
   memberId?: string;
-  categoryId?: string;
+  categoryId?: string | null;
 }): Promise<Sprint[]> => {
   const res = await fetch(
     `${API_BASE}?memberId=${params.memberId}&categoryId=${params.categoryId}`
@@ -19,10 +18,10 @@ const getSprintApi = async (params: {
 
 export const useGetSprintQuery = (params: {
   memberId?: string;
-  categoryId?: string;
+  categoryId?: string | null;
 }) =>
   useQuery<Sprint[], Error>({
-    queryKey: ["sprint", params],
+    queryKey: ["sprints", params],
     queryFn: () => getSprintApi(params),
     enabled: !!params.categoryId && !!params.memberId,
   });
@@ -37,10 +36,13 @@ export async function postSprintApi(data: PostSprintRequest): Promise<Sprint> {
   return res.json();
 }
 
-export async function patchSprintApi(
-  id: string,
-  data: Partial<PostSprintRequest>
-): Promise<Sprint> {
+export async function patchSprintApi({
+  id,
+  data,
+}: {
+  id: string;
+  data: Partial<PostSprintRequest>;
+}): Promise<Sprint> {
   const res = await fetch(`${API_BASE}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -50,7 +52,7 @@ export async function patchSprintApi(
   return res.json();
 }
 
-export async function deleteSprintApi(id: string): Promise<void> {
+export async function deleteSprintApi({ id }: { id: string }): Promise<void> {
   const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
 
   if (!res.ok) throw new Error("스프린트 삭제 실패");

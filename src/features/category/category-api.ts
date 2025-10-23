@@ -33,10 +33,13 @@ export async function postCategoryApi(
   return res.json();
 }
 
-export async function patchCategoryApi(
-  id: string,
-  data: Partial<PostCategoryRequest>
-): Promise<Category> {
+export async function patchCategoryApi({
+  id,
+  data,
+}: {
+  id: string;
+  data: Partial<PostCategoryRequest>;
+}): Promise<Category> {
   const res = await fetch(`${API_BASE}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -46,7 +49,7 @@ export async function patchCategoryApi(
   return res.json();
 }
 
-export async function deleteCategoryApi(id: string): Promise<void> {
+export async function deleteCategoryApi({ id }: { id: string }): Promise<void> {
   const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("카테고리 삭제 실패");
 }

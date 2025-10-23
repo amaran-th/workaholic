@@ -79,8 +79,8 @@ model DoStamp {
 model Sprint {
   id         String        @id @default(uuid())
   name       String
-  startDate  DateTime
-  endDate    DateTime
+  startDate  DateTime?
+  endDate    DateTime?
   createdAt DateTime  @default(now())
   memberId   String
   categoryId String

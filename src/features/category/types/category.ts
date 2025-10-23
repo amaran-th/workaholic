@@ -1,4 +1,3 @@
-import { Sprint } from "@/features/task/types/task";
 import { Color } from "@/lib/data";
 
 export interface Category {
@@ -7,7 +6,6 @@ export interface Category {
   color: Color;
   createdAt?: string;
   updatedAt?: string;
-  sprints: Sprint[];
 }
 
 export interface PostCategoryRequest {

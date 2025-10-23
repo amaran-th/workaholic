@@ -1,8 +1,8 @@
 export interface Sprint {
   id: string;
   name: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
   memberId: string;
   categoryId: string;
   createdAt: string;
@@ -10,8 +10,8 @@ export interface Sprint {
 
 export interface PostSprintRequest {
   name: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
   memberId: string;
   categoryId: string;
 }

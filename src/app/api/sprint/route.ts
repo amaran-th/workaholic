@@ -33,15 +33,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, startDate, endDate, categoryId, memberId } = body;
 
-    if (!name || !startDate || !endDate || !categoryId || !memberId) {
+    if (!name || !categoryId || !memberId) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
     const sprint = await prisma.sprint.create({
       data: {
         name,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
         categoryId,
         memberId,
       },

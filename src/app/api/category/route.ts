@@ -17,12 +17,7 @@ export async function GET(req: NextRequest) {
     // 특정 멤버의 카테고리만
     const categories = await prisma.category.findMany({
       where: { memberId },
-      include: {
-        sprints: {
-          orderBy: { startDate: "desc" },
-        },
-      },
-      orderBy: { name: "asc" }, // 정렬 옵션 (원하면 제거 가능)
+      orderBy: { createdAt: "desc" }, // 정렬 옵션 (원하면 제거 가능)
     });
 
     return NextResponse.json(categories, { status: 200 });
