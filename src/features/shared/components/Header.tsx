@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import NavigationButton from "./NavigationButton";
 
 export default function Header() {
   const [session, setSession] = useAtom(sessionAtom);
@@ -26,7 +27,10 @@ export default function Header() {
       <div className="flex-1 rounded-3xl bg-gray-600 p-1 px-4">광고</div>
       <div className="">
         {session?.access_token ? (
-          <MyButton />
+          <div className="flex gap-1">
+            <NavigationButton />
+            <MyButton />
+          </div>
         ) : (
           <Button onClick={() => router.push("/login")}>로그인</Button>
         )}
