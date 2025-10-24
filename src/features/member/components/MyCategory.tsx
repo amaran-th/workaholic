@@ -25,9 +25,7 @@ function MyCategory() {
   const [session] = useAtom(sessionAtom);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<Color>("white");
-  const [openedId, setOpenedId] = useState<string | null>(
-    "95c5983a-5b9d-4e3c-8558-12ae1667c471"
-  );
+  const [openedId, setOpenedId] = useState<string | null>(null);
   const { data } = useGetCategoriesQuery({ memberId: session?.user.id });
 
   const memberId = useMemo(() => session?.user.id, [session]);
