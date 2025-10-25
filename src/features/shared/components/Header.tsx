@@ -22,7 +22,7 @@ export default function Header() {
       )}
     >
       <div className="">
-        <Link href="/">워커홀릭</Link>
+        <Link href="/">일을:하자</Link>
       </div>
       <div className="flex-1 rounded-3xl bg-gray-600 p-1 px-4">광고</div>
       <div className="">
