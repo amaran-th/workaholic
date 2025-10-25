@@ -1,7 +1,7 @@
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
-import { formatDateTimeString } from "@/lib/utils";
+import { TaskFilter } from "@/features/task/types/task";
+import { formatDateTimeString } from "@/lib/utils/formatDate";
 import { atom } from "jotai";
-import { TaskFilter } from "../../types/task";
 
 export const selectedDateAtom = atom<Date>(new Date());
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import MyButton from "@/features/shared/components/MyButton";
 import { HEADER_HEIGHT } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

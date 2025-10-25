@@ -6,13 +6,13 @@ import {
   useGetCenterPositionQuery,
 } from "@/features/member/member-api";
 import { MemberPosition } from "@/features/member/types/member";
+import { taskFilterAtom } from "@/lib/react-flow/store/matrixAtom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Edge, Node } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { patchTaskApi, useGetTasksQuery } from "../../task-api";
-import { EdgeType, NodeType, PatchTaskRequest } from "../../types/task";
-import { taskFilterAtom } from "../store/matrixAtom";
+import { patchTaskApi, useGetTasksQuery } from "../task-api";
+import { EdgeType, NodeType, PatchTaskRequest } from "../types/task";
 
 export default function useMatrixFlow(
   setNodes: Dispatch<SetStateAction<Node[]>>,

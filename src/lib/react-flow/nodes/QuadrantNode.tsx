@@ -5,20 +5,18 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
+import { postTaskApi } from "@/features/task/task-api";
+import { PostTaskRequest } from "@/features/task/types/task";
 import { HEADER_HEIGHT } from "@/lib/data";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NodeProps, useReactFlow } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { Plus } from "lucide-react";
 import { MouseEvent, useState } from "react";
-import { postTaskApi } from "../../task-api";
-import { PostTaskRequest } from "../../types/task";
 import { defaultCategoryIdAtom, taskFilterAtom } from "../store/matrixAtom";
 
 function QuadrantNode({
   data,
-  positionAbsoluteX,
-  positionAbsoluteY,
 }: NodeProps & { data: { bgcolor: string; width: number; height: number } }) {
   const { getViewport } = useReactFlow();
   const [contextPos, setContextPos] = useState<{

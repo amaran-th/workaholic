@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { cn, formatKoreanDate } from "@/lib/utils";
+import { cn, formatKoreanDate } from "@/lib/utils/utils";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,

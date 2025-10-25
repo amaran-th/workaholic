@@ -1,7 +1,8 @@
 import { Card, CardDescription } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { colorMap } from "@/lib/data";
-import { formatDDayString } from "@/lib/utils";
+import { taskFilterAtom } from "@/lib/react-flow/store/matrixAtom";
+import { formatDDayString } from "@/lib/utils/formatDate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import {
@@ -12,10 +13,9 @@ import {
   Timer,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import FlexibleTextArea from "../../components/FlexibleTextArea";
 import { patchTaskApi } from "../../task-api";
 import { PatchTaskRequest, TaskWithRelations } from "../../types/task";
-import { taskFilterAtom } from "../store/matrixAtom";
+import FlexibleTextArea from "./FlexibleTextArea";
 
 function TaskCard({
   data,

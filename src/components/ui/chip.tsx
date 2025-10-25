@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Color, colorMap } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { cva, VariantProps } from "class-variance-authority";
 
 const chipVariants = cva("rounded-full", {

@@ -1,4 +1,3 @@
-// src/utils/queryString.ts
 export const toQueryString = (params?: Record<string, any>): string => {
   if (!params) return "";
   const query = Object.entries(params)

@@ -1,11 +1,3 @@
-import { clsx, type ClassValue } from "clsx";
-import { toast } from "react-toastify";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 export const formatDDayString = (
   criteria: Date,
   targetDate: string | null
@@ -101,8 +93,4 @@ export const formatKoreanDate = (date: string | null) => {
   return new Date(date).toLocaleDateString("ko-KR", {
     timeZone: "Asia/Seoul",
   });
-};
-
-export const notifyNotSupportedFeature = () => {
-  toast("아직 제공되지 않는 기능이에요");
 };

@@ -21,12 +21,7 @@ import {
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { useGetCategoriesQuery } from "@/features/category/category-api";
 import { Color, colorMap } from "@/lib/data";
-import {
-  cn,
-  formatDateString,
-  formatDateTimeString,
-  isSameDay,
-} from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NodeProps } from "@xyflow/react";
 import { useAtom } from "jotai";
@@ -38,20 +33,29 @@ import {
   Trash,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import FlexibleTextArea from "../../components/FlexibleTextArea";
+
+import FlexibleTextArea from "@/features/task/components/matrix/FlexibleTextArea";
+import TaskCard from "@/features/task/components/matrix/TaskCard";
 import {
   deleteTaskApi,
   patchTaskApi,
   toggleCompleteStamp,
   toggleDoingStamp,
-} from "../../task-api";
-import { PatchTaskRequest, TaskWithRelations } from "../../types/task";
+} from "@/features/task/task-api";
+import {
+  PatchTaskRequest,
+  TaskWithRelations,
+} from "@/features/task/types/task";
+import {
+  formatDateString,
+  formatDateTimeString,
+  isSameDay,
+} from "@/lib/utils/formatDate";
 import {
   defaultCategoryIdAtom,
   selectedDateAtom,
   taskFilterAtom,
 } from "../store/matrixAtom";
-import TaskCard from "./TaskCard";
 
 function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const [session] = useAtom(sessionAtom);

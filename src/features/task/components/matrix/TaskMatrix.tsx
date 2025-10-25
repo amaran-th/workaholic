@@ -1,11 +1,10 @@
 "use client";
 
-import AxisEdge from "@/features/task/matrix/edges/AxisEdge";
-import useMatrixFlow from "@/features/task/matrix/hooks/useMatrixFlow";
-import AxisEndPointNode from "@/features/task/matrix/nodes/AxisEndPointNode";
-import IntersectionNode from "@/features/task/matrix/nodes/IntersectionNode";
-import TaskNode from "@/features/task/matrix/nodes/TaskNode";
-
+import AxisEdge from "@/lib/react-flow/edges/AxisEdge";
+import AxisEndPointNode from "@/lib/react-flow/nodes/AxisEndPointNode";
+import IntersectionNode from "@/lib/react-flow/nodes/IntersectionNode";
+import QuadrantNode from "@/lib/react-flow/nodes/QuadrantNode";
+import TaskNode from "@/lib/react-flow/nodes/TaskNode";
 import {
   Edge,
   Node,
@@ -14,7 +13,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import QuadrantNode from "./nodes/QuadrantNode";
+import useMatrixFlow from "../../hooks/useMatrixFlow";
 
 const nodeTypes = {
   task: TaskNode,
