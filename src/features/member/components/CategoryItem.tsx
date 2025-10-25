@@ -206,7 +206,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
         <div className="p-3 pt-1 pl-7">
           <div className="pl-4 space-y-4 border-l-4">
             <div className="text-sm flex gap-2 items-end">
-              <div className="grow flex gap-2">
+              <div className="grow flex gap-2 flex-col sm:flex-row">
                 <div className="flex flex-col gap-1 grow">
                   <Label htmlFor="date" className="text-xs">
                     스프린트명

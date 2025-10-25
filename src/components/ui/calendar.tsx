@@ -230,14 +230,14 @@ function CalendarSelect({
   const [open, setOpen] = React.useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col w-full max-w-36 gap-1">
       {!!label && (
         <Label htmlFor="date" className="text-xs">
           {label}
         </Label>
       )}
       {readonly ? (
-        <p className="text-xs w-36 text-secondary leading-8">
+        <p className="text-xs text-secondary leading-8">
           {date ? formatKoreanDate(date) : "미정"}
         </p>
       ) : (
@@ -248,7 +248,7 @@ function CalendarSelect({
               variant="outline"
               size="sm"
               id="date"
-              className="w-36 text-xs justify-between font-normal"
+              className="w-full text-xs justify-between font-normal"
             >
               {date ? formatKoreanDate(date) : "날짜 선택"}
               <ChevronDownIcon />

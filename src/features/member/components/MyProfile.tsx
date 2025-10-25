@@ -91,10 +91,12 @@ function MyProfile() {
         <CardTitle>프로필</CardTitle>
         <CardDescription>개인 정보를 관리할 수 있습니다.</CardDescription>
       </CardHeader>
-      <CardContent className="flex gap-8">
+      <CardContent className="flex gap-8 flex-col sm:flex-row">
         {isFetching ? (
           <>
-            <Skeleton className="w-[200px] h-[200px] rounded-full" />
+            <div className="flex justify-center">
+              <Skeleton className="w-[200px] h-[200px] rounded-full" />
+            </div>
             <div className="flex flex-col gap-3 flex-1 justify-center">
               <Skeleton className="h-10 w-1/2" />
               <Skeleton className="h-5 w-3/4" />
@@ -103,22 +105,24 @@ function MyProfile() {
           </>
         ) : (
           <>
-            <div className="relative">
-              <Image
-                src={data?.avatarUrl ?? "/default-profile.png"}
-                alt={"프로필 이미지"}
-                width="200"
-                height="200"
-                className="rounded-full"
-              />
-              <Button
-                className="absolute bottom-0 right-0"
-                size="icon-lg"
-                onClick={notifyNotSupportedFeature}
-                rounded
-              >
-                <Plus />
-              </Button>
+            <div className="flex justify-center">
+              <div className="relative">
+                <Image
+                  src={data?.avatarUrl ?? "/default-profile.png"}
+                  alt={"프로필 이미지"}
+                  width="200"
+                  height="200"
+                  className="rounded-full"
+                />
+                <Button
+                  className="absolute bottom-0 right-0"
+                  size="icon-lg"
+                  onClick={notifyNotSupportedFeature}
+                  rounded
+                >
+                  <Plus />
+                </Button>
+              </div>
             </div>
             <div className="flex flex-col gap-3 justify-center flex-1 w-full">
               <InfoRow label="이름">
