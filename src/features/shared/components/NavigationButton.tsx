@@ -31,7 +31,7 @@ export default function NavigationButton() {
           : undefined
       }
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger>
         <SelectValue placeholder="뷰 모드 선택" />
       </SelectTrigger>
       <SelectContent>
