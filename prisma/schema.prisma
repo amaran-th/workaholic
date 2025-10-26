@@ -49,8 +49,6 @@ model Task {
   endDate     DateTime?
   dueDate     DateTime?
   comment     String?
-  positionX   Float
-  positionY   Float
   createdAt DateTime  @default(now())
 
   // 관계
@@ -65,6 +63,7 @@ model Task {
   subTasks     Task[]  @relation("SubTasks")
 
   doStamps   DoStamp[]
+  taskPositions   TaskPosition[]
   sprint    Sprint?  @relation(fields: [sprintId], references: [id])
   sprintId  String?
 }
@@ -74,6 +73,15 @@ model DoStamp {
   task      Task     @relation(fields: [taskId], references: [id])
   taskId    String
   createdAt DateTime @default(now())
+}
+
+model TaskPosition {
+  id        String   @id @default(uuid())
+  positionX   Float
+  positionY   Float
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  date      String
 }
 
 model Sprint {
