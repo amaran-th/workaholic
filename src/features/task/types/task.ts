@@ -6,8 +6,18 @@ export type DoStamp = {
   taskId: string;
   createdAt: string; // ISO string
 };
-
-export type TaskStatus = "PENDING" | "DOING" | "DONE";
+export enum TaskStatus {
+  TODO = "TODO",
+  DOING = "DOING",
+  COMPLETED = "COMPLETED",
+  QUIT = "QUIT",
+  ICE = "ICE",
+}
+export enum DayTaskStatus {
+  TODO,
+  DOINT,
+  COMPLTED,
+}
 
 export type TaskWithRelations = {
   id: string;
@@ -54,8 +64,6 @@ export type PostTaskRequest = {
 export type PatchTaskRequest = Partial<{
   content: string;
   memo: string;
-  positionX: number | null;
-  positionY: number | null;
   dueDate: Date | null;
   categoryId: string | null;
   parentTaskId: string | null;
@@ -64,9 +72,7 @@ export type PatchTaskRequest = Partial<{
 
 export type TaskFilter = {
   memberId: string;
-  categoryId?: string;
-  sprintId?: string;
-  startDateAfter?: string;
-  endDateBefore?: string;
-  createdAtAfter?: string;
+  categoryId?: string | null;
+  sprintId?: string | null;
+  date?: string | null;
 };

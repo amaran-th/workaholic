@@ -31,7 +31,7 @@ function QuadrantNode({
     mutationFn: (vars: PostTaskRequest) => postTaskApi(vars),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });

@@ -13,8 +13,6 @@ export async function PATCH(
       "content",
       "memo",
       "comment",
-      "positionX",
-      "positionY",
       "dueDate",
       "categoryId",
       "parentTaskId",

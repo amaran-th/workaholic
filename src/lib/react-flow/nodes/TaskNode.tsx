@@ -49,6 +49,7 @@ import {
 import {
   formatDateString,
   formatDateTimeString,
+  formatDateTimeStringData,
   isSameDay,
 } from "@/lib/utils/formatDate";
 import {
@@ -76,7 +77,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     }) => patchTaskApi({ taskId, data }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });
@@ -85,7 +86,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     mutationFn: ({ taskId }: { taskId: string }) => deleteTaskApi({ taskId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });
@@ -100,7 +101,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     }) => toggleDoingStamp({ taskId, params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });
@@ -114,7 +115,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     }) => toggleCompleteStamp({ taskId, params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });
@@ -175,7 +176,13 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             onClick={() => {
               toggleDoing.mutate({
                 taskId: data.id,
-                params: { date: formatDateTimeString(selectedDate) },
+                params: {
+                  date:
+                    !selectedDate ||
+                    formatDateString(new Date()) === selectedDate
+                      ? formatDateTimeStringData(new Date())
+                      : selectedDate,
+                },
               });
             }}
             color="progress"
@@ -193,7 +200,13 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             onClick={() => {
               toggleComplete.mutate({
                 taskId: data.id,
-                params: { date: formatDateTimeString(selectedDate) },
+                params: {
+                  date:
+                    !selectedDate ||
+                    formatDateString(new Date()) === selectedDate
+                      ? formatDateTimeStringData(new Date())
+                      : selectedDate,
+                },
               });
             }}
             color="success"

@@ -6,19 +6,23 @@ import {
   useGetCenterPositionQuery,
 } from "@/features/member/member-api";
 import { MemberPosition } from "@/features/member/types/member";
-import { taskFilterAtom } from "@/lib/react-flow/store/matrixAtom";
+import {
+  selectedDateAtom,
+  taskFilterAtom,
+} from "@/lib/react-flow/store/matrixAtom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Edge, Node } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { patchTaskApi, useGetTasksQuery } from "../task-api";
-import { EdgeType, NodeType, PatchTaskRequest } from "../types/task";
+import { patchTaskPositionApi, useGetMatrixTasksQuery } from "../task-api";
+import { EdgeType, NodeType } from "../types/task";
 
 export default function useMatrixFlow(
   setNodes: Dispatch<SetStateAction<Node[]>>,
   setEdges: Dispatch<SetStateAction<Edge[]>>
 ) {
   const [session] = useAtom(sessionAtom);
+  const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
   const [localCenterPosition, setLocalCenterPosition] =
@@ -41,7 +45,7 @@ export default function useMatrixFlow(
       setLocalCenterPosition(centerPosition);
     }
   }, [centerPosition]);
-  const { data: tasks } = useGetTasksQuery(taskFilter, {
+  const { data: tasks } = useGetMatrixTasksQuery(taskFilter, {
     enabled: !!session?.user?.id,
   });
 
@@ -54,11 +58,11 @@ export default function useMatrixFlow(
       data,
     }: {
       taskId: string;
-      data: PatchTaskRequest;
-    }) => patchTaskApi({ taskId, data }),
+      data: { positionX: number; positionY: number; positionDate: string };
+    }) => patchTaskPositionApi({ taskId, data }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });
@@ -352,7 +356,7 @@ export default function useMatrixFlow(
 
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [tasks, centerPosition]);
+  }, [tasks, centerPosition, localCenterPosition, setNodes, setEdges]);
 
   useEffect(() => {
     const { centerX, centerY, left, right, top, bottom } = localCenterPosition;
@@ -482,6 +486,7 @@ export default function useMatrixFlow(
   }, [localCenterPosition, setNodes]);
 
   const handleNodeDrag = (event: React.MouseEvent, node: Node) => {
+    if (!selectedDate) return;
     if (node.id === "center") {
       setLocalCenterPosition((prev) => ({
         ...prev,
@@ -544,6 +549,7 @@ export default function useMatrixFlow(
   };
 
   const handleNodeDragStop = async (event: React.MouseEvent, node: Node) => {
+    if (!selectedDate) return;
     if (
       [
         "center",
@@ -571,6 +577,7 @@ export default function useMatrixFlow(
         data: {
           positionX: node.position.x,
           positionY: node.position.y,
+          positionDate: selectedDate,
         },
       });
     }

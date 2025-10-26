@@ -40,7 +40,7 @@ function TaskCard({
     }) => patchTaskApi({ taskId, data }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tasks", taskFilter],
+        queryKey: ["matrix-tasks", taskFilter],
       });
     },
   });

@@ -11,20 +11,37 @@ import {
 
 const API_BASE = "/api/task";
 
-const getTasksApi = async (params: TaskFilter) => {
+const getMatrixTasksApi = async (params: TaskFilter) => {
   const queryString = toQueryString(params);
-  const res = await fetch(`${API_BASE}${queryString}`);
+  const res = await fetch(`${API_BASE}/matrix${queryString}`);
   if (!res.ok) throw new Error("Task 불러오기 실패");
   return res.json();
 };
 
-export const useGetTasksQuery = (
+export const useGetMatrixTasksQuery = (
   params: TaskFilter,
   options?: { enabled?: boolean }
 ) =>
   useQuery<TaskWithRelations[], Error>({
-    queryKey: ["tasks", params],
-    queryFn: () => getTasksApi(params),
+    queryKey: ["matrix-tasks", params],
+    queryFn: () => getMatrixTasksApi(params),
+    ...options,
+  });
+
+const getListTasksApi = async (params: TaskFilter) => {
+  const queryString = toQueryString(params);
+  const res = await fetch(`${API_BASE}/list${queryString}`);
+  if (!res.ok) throw new Error("리스트 뷰 Task 불러오기 실패");
+  return res.json();
+};
+
+export const useGetListTasksQuery = (
+  params: TaskFilter,
+  options?: { enabled?: boolean }
+) =>
+  useQuery<(TaskWithRelations & { pinned: boolean })[], Error>({
+    queryKey: ["list-tasks", params],
+    queryFn: () => getListTasksApi(params),
     ...options,
   });
 
@@ -51,6 +68,22 @@ export const patchTaskApi = async ({
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error("Task 수정 실패");
+  return res.json();
+};
+
+export const patchTaskPositionApi = async ({
+  taskId,
+  data,
+}: {
+  taskId: string;
+  data: { positionX: number; positionY: number; positionDate: string };
+}) => {
+  const res = await fetch(`${API_BASE}/${taskId}/position`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Task 위치 수정 실패");
   return res.json();
 };
 

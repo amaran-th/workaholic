@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { convertKSTDateToUTC } from "@/lib/utils/formatDate";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -7,8 +8,10 @@ export async function POST(
 ) {
   try {
     const { id: taskId } = params;
-    const { date } = await req.json();
-    const targetDate = new Date(date);
+    const { date } = await req.json(); // YYYY-MM-DDTHH:mm:ss KST
+    if (!date) return new NextResponse("date is required", { status: 400 });
+
+    const { startUTC, UTC, endUTC } = convertKSTDateToUTC(date);
 
     const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (!task) throw new Error("Task not found");
@@ -18,8 +21,8 @@ export async function POST(
       where: {
         taskId,
         createdAt: {
-          gte: new Date(targetDate.setHours(0, 0, 0, 0)),
-          lt: new Date(targetDate.setHours(23, 59, 59, 999)),
+          gte: startUTC,
+          lt: endUTC,
         },
       },
     });
@@ -32,7 +35,7 @@ export async function POST(
 
     // 이후 도장 존재 여부 확인
     const afterStamps = await prisma.doStamp.findMany({
-      where: { taskId, createdAt: { gt: targetDate } },
+      where: { taskId, createdAt: { gt: endUTC } },
     });
 
     if (afterStamps.length > 0) {
@@ -45,7 +48,7 @@ export async function POST(
     const updatedTask = await prisma.task.update({
       where: { id: taskId },
       data: {
-        endDate: task.endDate === null ? targetDate : null,
+        endDate: task.endDate === null ? UTC : null,
       },
     });
 
