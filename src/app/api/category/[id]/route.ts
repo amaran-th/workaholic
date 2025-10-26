@@ -36,15 +36,14 @@ export async function DELETE(
   try {
     const categoryId = params.id;
 
-    // 1️⃣ 관련 스프린트 먼저 삭제
-    await prisma.sprint.deleteMany({
-      where: { categoryId },
-    });
-
-    // 2️⃣ 카테고리 삭제
-    await prisma.category.delete({
-      where: { id: categoryId },
-    });
+    await prisma.$transaction([
+      prisma.sprint.deleteMany({
+        where: { categoryId: categoryId },
+      }),
+      prisma.category.delete({
+        where: { id: categoryId },
+      }),
+    ]);
 
     return NextResponse.json({
       message: "Category and related sprints deleted",

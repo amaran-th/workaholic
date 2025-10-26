@@ -47,6 +47,9 @@ export async function DELETE(
       prisma.doStamp.deleteMany({
         where: { taskId: id },
       }),
+      prisma.taskPosition.deleteMany({
+        where: { taskId: id },
+      }),
       prisma.task.delete({
         where: { id },
       }),
