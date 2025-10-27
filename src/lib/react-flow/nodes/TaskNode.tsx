@@ -15,6 +15,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -34,6 +35,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { useGetSprintQuery } from "@/features/sprint/sprint-api";
 import FlexibleTextArea from "@/features/task/components/matrix/FlexibleTextArea";
 import TaskCard from "@/features/task/components/matrix/TaskCard";
 import {
@@ -50,6 +52,7 @@ import {
   formatDateString,
   formatDateTimeString,
   formatDateTimeStringData,
+  formatKoreanDate,
   isSameDay,
 } from "@/lib/utils/formatDate";
 import {
@@ -58,15 +61,116 @@ import {
   taskFilterAtom,
 } from "../store/matrixAtom";
 
-function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
+function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
+  const queryClient = useQueryClient();
   const [session] = useAtom(sessionAtom);
+  const [taskFilter] = useAtom(taskFilterAtom);
+
+  const { data: categories } = useGetCategoriesQuery({
+    memberId: session?.user.id ?? "",
+  });
+
+  const { data: sprints } = useGetSprintQuery({
+    memberId: session?.user.id ?? "",
+    categoryId: task.category.id,
+  });
+
+  const patchTask = useMutation({
+    mutationFn: ({
+      taskId,
+      data,
+    }: {
+      taskId: string;
+      data: PatchTaskRequest;
+    }) => patchTaskApi({ taskId, data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["matrix-tasks", taskFilter],
+      });
+    },
+  });
+
+  const [, setDefaultCategoryId] = useAtom(defaultCategoryIdAtom);
+  return (
+    <>
+      <ContextMenuItem keepOpen>
+        {" "}
+        <Select
+          value={task.category?.id}
+          onValueChange={(value: string) => {
+            setDefaultCategoryId(value);
+            patchTask.mutate({
+              taskId: task.id,
+              data: { categoryId: value },
+            });
+          }}
+        >
+          <SelectTrigger className="max-h-fit w-full">
+            <SelectValue placeholder="카테고리 선택" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories?.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block rounded-full size-3"
+                    style={{
+                      backgroundColor: colorMap[category.color as Color].sub,
+                    }}
+                  />
+                  {category.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </ContextMenuItem>
+      <ContextMenuItem keepOpen>
+        <Select
+          value={task.sprint?.id}
+          onValueChange={(value: string) => {
+            patchTask.mutate({
+              taskId: task.id,
+              data: { sprintId: value === "clear" ? null : value },
+            });
+          }}
+          disabled={!sprints?.length || !task.category}
+        >
+          <SelectTrigger className="max-h-fit w-full">
+            <SelectValue placeholder="스프린트 선택">
+              {task.sprint ? task.sprint.name : ""}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="clear">
+              <span className="text-muted-foreground">선택 해제</span>
+            </SelectItem>
+            <SelectSeparator />
+            {sprints?.map((sprint) => (
+              <SelectItem key={sprint.id} value={sprint.id}>
+                <div className="flex flex-col">
+                  <p>{sprint.name}</p>
+                  <p className="text-secondary text-xs">
+                    {formatKoreanDate(sprint.startDate)}~
+                    {formatKoreanDate(sprint.endDate)}
+                  </p>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </ContextMenuItem>
+    </>
+  );
+}
+
+function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
-  const [, setDefaultCategoryId] = useAtom(defaultCategoryIdAtom);
   const queryClient = useQueryClient();
   const [memo, setMemo] = useState<string>(data.memo ?? "");
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
-  console.log(dueDate?.slice(11, 19));
+
   const patchTask = useMutation({
     mutationFn: ({
       taskId,
@@ -120,10 +224,6 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
     },
   });
 
-  const { data: categories } = useGetCategoriesQuery({
-    memberId: session?.user.id ?? "",
-  });
-
   const isDoing = useMemo(
     () => data.doStamps.some((stamp) => isSameDay(stamp.createdAt)),
     [data.doStamps]
@@ -139,37 +239,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
         <TaskCard data={data} isDoing={isDoing} isCompleted={isCompleted} />
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem keepOpen>
-          <Select
-            value={data.category?.id}
-            onValueChange={(value: string) => {
-              setDefaultCategoryId(value);
-              patchTask.mutate({
-                taskId: data.id,
-                data: { categoryId: value },
-              });
-            }}
-          >
-            <SelectTrigger className="max-h-fit">
-              <SelectValue placeholder="카테고리 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories?.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-block rounded-full size-3"
-                      style={{
-                        backgroundColor: colorMap[category.color as Color].sub,
-                      }}
-                    />
-                    {category.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </ContextMenuItem>
+        <CategorySprintSelector task={data} />
         <ContextMenuSeparator />
         <ContextMenuItem keepOpen>
           <Button
