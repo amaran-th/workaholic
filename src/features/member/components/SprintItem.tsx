@@ -77,6 +77,7 @@ function SprintItem({ sprint }: SprintItemProps) {
               handleFormChange("startDate", newValue?.toISOString() ?? null);
             }}
             readonly={!editable}
+            buttonProps={{ size: "sm", color: "secondary" }}
           />
           <CalendarSelect
             label="종료일"
@@ -85,6 +86,7 @@ function SprintItem({ sprint }: SprintItemProps) {
               handleFormChange("endDate", newValue?.toISOString() ?? null);
             }}
             readonly={!editable}
+            buttonProps={{ size: "sm", color: "secondary" }}
           />
         </div>
       </div>

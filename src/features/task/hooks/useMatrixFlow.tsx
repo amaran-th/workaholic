@@ -571,7 +571,7 @@ export default function useMatrixFlow(
         ...localCenterPosition,
       });
     } else if (node.type === "task") {
-      console.log("업무 드래그 종료:", node.position);
+      console.log("업무 드래그 종료:", node, selectedDate, node.position);
       patchTask.mutate({
         taskId: node.id,
         data: {

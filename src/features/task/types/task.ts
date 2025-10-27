@@ -68,6 +68,7 @@ export type PatchTaskRequest = Partial<{
   categoryId: string | null;
   parentTaskId: string | null;
   sprintId: string | null;
+  comment: string | null;
 }>;
 
 export type TaskFilter = {

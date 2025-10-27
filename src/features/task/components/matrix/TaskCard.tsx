@@ -1,5 +1,5 @@
+import { CategoryBadge } from "@/components/ui/badge";
 import { Card, CardDescription } from "@/components/ui/card";
-import { Chip } from "@/components/ui/chip";
 import { colorMap } from "@/lib/data";
 import { taskFilterAtom } from "@/lib/react-flow/store/matrixAtom";
 import { formatDDayString } from "@/lib/utils/formatDate";
@@ -96,11 +96,9 @@ function TaskCard({
 
       <div className="flex gap-1 items-center justify-between">
         {data.category ? (
-          <Chip
-            label={data.category.name}
-            customColor={data.category.color}
-            size="sm"
-          />
+          <CategoryBadge customColor={data.category.color} size="xs">
+            {data.category.name}
+          </CategoryBadge>
         ) : (
           <div />
         )}

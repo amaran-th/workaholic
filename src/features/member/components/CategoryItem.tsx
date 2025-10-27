@@ -230,6 +230,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
                         newValue?.toISOString() ?? null
                       );
                     }}
+                    buttonProps={{ size: "sm", color: "secondary" }}
                   />
                   <CalendarSelect
                     label="종료일"
@@ -240,6 +241,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
                         newValue?.toISOString() ?? null
                       );
                     }}
+                    buttonProps={{ size: "sm", color: "secondary" }}
                   />
                 </div>
               </div>

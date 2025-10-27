@@ -1,6 +1,7 @@
+import { Badge, CategoryBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarSelect } from "@/components/ui/calendar";
-import { Chip } from "@/components/ui/chip";
+import { CellInput } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -33,8 +34,12 @@ import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Pin, Trash2 } from "lucide-react";
-import { deleteTaskApi, useGetListTasksQuery } from "../../task-api";
-import { TaskStatus } from "../../types/task";
+import {
+  deleteTaskApi,
+  patchTaskApi,
+  useGetListTasksQuery,
+} from "../../task-api";
+import { PatchTaskRequest, TaskStatus } from "../../types/task";
 import StatusBadge from "./StatusBadge";
 
 function TaskList() {
@@ -51,7 +56,22 @@ function TaskList() {
   const { data: tasks, isFetching } = useGetListTasksQuery(taskFilter, {
     enabled: !!session?.user?.id,
   });
-  console.log(tasks);
+
+  const patchTask = useMutation({
+    mutationFn: ({
+      taskId,
+      data,
+    }: {
+      taskId: string;
+      data: PatchTaskRequest;
+    }) => patchTaskApi({ taskId, data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+  });
+
   const deleteTask = useMutation({
     mutationFn: ({ taskId }: { taskId: string }) => deleteTaskApi({ taskId }),
     onSuccess: () => {
@@ -69,8 +89,7 @@ function TaskList() {
 
   return (
     <>
-      <div className="flex gap-2 justify-between">
-        <h1 className="text-2xl font-bold">📋 오늘의 업무</h1>
+      <div className="flex gap-2 justify-end">
         <div className="flex gap-1">
           <CalendarSelect
             date={selectedDate ?? null}
@@ -125,28 +144,28 @@ function TaskList() {
       </div>
 
       <div className="rounded-md border bg-card shadow-sm overflow-hidden">
-        <Table>
+        <Table className="table-auto border-collapse">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px] text-center"></TableHead>
-              <TableHead className="w-[50px] text-center">#</TableHead>
-              <TableHead>제목</TableHead>
-              <TableHead>카테고리</TableHead>
-              <TableHead>스프린트</TableHead>
-              <TableHead>진행 상태</TableHead>
-              <TableHead>시작일</TableHead>
-              <TableHead>종료일</TableHead>
-              <TableHead>마감일</TableHead>
-              <TableHead>메모</TableHead>
-              <TableHead>기록</TableHead>
+              <TableHead className="min-w-[50px]" />
               <TableHead />
+              <TableHead className="min-w-[400px]">제목</TableHead>
+              <TableHead>상태</TableHead>
+              <TableHead className="min-w-[180px]">카테고리</TableHead>
+              <TableHead className="min-w-[240px]">스프린트</TableHead>
+              <TableHead className="min-w-[160px]">시작일</TableHead>
+              <TableHead className="min-w-[160px]">종료일</TableHead>
+              <TableHead className="min-w-[160px]">마감일</TableHead>
+              <TableHead className="min-w-[300px]">메모</TableHead>
+              <TableHead className="min-w-[300px]">기록</TableHead>
+              <TableHead className="min-w-[100px]" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {isFetching ? (
               <TableRow>
                 <TableCell
-                  colSpan={11}
+                  colSpan={12}
                   className="text-center text-muted-foreground py-6"
                 >
                   불러오는 중...
@@ -159,33 +178,82 @@ function TaskList() {
                   className="cursor-pointer hover:bg-accent transition-colors"
                   onClick={() => console.log("Task 클릭:", task.id)}
                 >
-                  <TableCell className="text-center">
+                  <TableCell align="center">
                     <Pin
                       className={cn("text-divider", {
                         "text-error": task.pinned,
                       })}
                     />
                   </TableCell>
-                  <TableCell className="text-center">{task.no}</TableCell>
-                  <TableCell className="font-medium">{task.content}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={task.category.name}
-                      customColor={task.category.color}
+                  <TableCell className="text-secondary">#{task.no}</TableCell>
+                  <TableCell className="font-medium truncate">
+                    <CellInput
+                      defaultValue={task.content ?? ""}
+                      onSubmit={(value) => {
+                        patchTask.mutate({
+                          taskId: task.id,
+                          data: { content: String(value) },
+                        });
+                      }}
                     />
                   </TableCell>
-                  <TableCell>{task.sprint ? task.sprint.name : "-"}</TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <StatusBadge
                       status={getTaskStatus(task.startDate, task.endDate)}
                     />
                   </TableCell>
+                  <TableCell>
+                    <CategoryBadge customColor={task.category.color}>
+                      {task.category.name}
+                    </CategoryBadge>
+                  </TableCell>
+                  <TableCell>
+                    {task.sprint ? (
+                      <Badge variant="secondary" className="bg-gray-200">
+                        {task.sprint.name}
+                      </Badge>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
                   <TableCell>{formatKoreanDate(task.startDate, "-")}</TableCell>
                   <TableCell>{formatKoreanDate(task.endDate, "-")}</TableCell>
-                  <TableCell>{formatKoreanDate(task.dueDate, "-")}</TableCell>
-                  <TableCell>{task.memo}</TableCell>
-                  <TableCell>{task.comment}</TableCell>
                   <TableCell>
+                    <CalendarSelect
+                      date={task.dueDate}
+                      placeholder="-"
+                      onSelect={(newValue) => {
+                        patchTask.mutate({
+                          taskId: task.id,
+                          data: { dueDate: newValue },
+                        });
+                      }}
+                      cell
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <CellInput
+                      defaultValue={task.memo ?? ""}
+                      onSubmit={(value) => {
+                        patchTask.mutate({
+                          taskId: task.id,
+                          data: { memo: String(value) },
+                        });
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <CellInput
+                      defaultValue={task.comment ?? ""}
+                      onSubmit={(value) => {
+                        patchTask.mutate({
+                          taskId: task.id,
+                          data: { comment: String(value) },
+                        });
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className="flex justify-center">
                     <Button
                       color="error"
                       onClick={() => {
@@ -215,21 +283,3 @@ function TaskList() {
 }
 
 export default TaskList;
-
-/* task-position
-id
-positionX
-positionY
-date
-taskId
-
-task
-:taskPositions[]
-
-// 오늘의 업무
-
-
-
-// 전체 업무
-
-*/
