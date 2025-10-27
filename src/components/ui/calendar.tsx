@@ -3,6 +3,7 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatKoreanDate } from "@/lib/utils/formatDate";
 import { cn } from "@/lib/utils/utils";
+import { VariantProps } from "class-variance-authority";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -217,16 +218,22 @@ function CalendarDayButton({
 
 interface CalendarSelectProps {
   label?: string;
+  placeholder?: string;
   readonly?: boolean;
   date: string | null;
   onSelect: (newValue: Date | undefined) => void;
+  cell?: boolean; // focusing되지 않은 상태에서는 일반 텍스트처럼 보이도록 할지
+  buttonProps?: VariantProps<typeof buttonVariants>;
 }
 
 function CalendarSelect({
   label,
+  placeholder,
   readonly,
   date,
   onSelect,
+  cell,
+  buttonProps,
 }: CalendarSelectProps) {
   const [open, setOpen] = React.useState<boolean>(false);
 
@@ -245,14 +252,16 @@ function CalendarSelect({
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              color="secondary"
-              variant="outline"
-              size="sm"
+              variant={cell && !open ? "text" : "outline"}
               id="date"
-              className="w-full text-xs justify-between font-normal"
+              className={cn("w-full justify-between", {
+                "pl-0": cell && !open,
+              })}
+              {...buttonProps}
+              color={buttonProps?.color ?? undefined}
             >
-              {date ? formatKoreanDate(date) : "날짜 선택"}
-              <ChevronDownIcon />
+              {date ? formatKoreanDate(date) : placeholder ?? "날짜 선택"}
+              {(!cell || open) && <ChevronDownIcon />}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
