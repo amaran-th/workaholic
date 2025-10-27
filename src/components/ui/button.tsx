@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils/utils";
 
 const buttonVariants = cva(
-  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -15,7 +15,8 @@ const buttonVariants = cva(
         outline:
           "border bg-background shadow-xs dark:bg-input/30 dark:border-input",
         ghost: "hover:bg-accent dark:hover:bg-accent/50",
-        link: "underline-offset-4 hover:underline",
+        link: "bg-transparent underline-offset-4 hover:underline hover:bg-transparent",
+        text: "bg-transparent text-primary hover:bg-transparent",
       },
       color: {
         primary: "",
@@ -26,9 +27,9 @@ const buttonVariants = cva(
         error: "bg-error text-white hover:bg-error/90",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        default: "h-9 px-4 py-2 has-[>svg]:px-3 text-sm",
+        sm: "h-8 text-xs rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 text-base rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
@@ -155,27 +156,63 @@ const buttonVariants = cva(
       {
         variant: "link",
         color: "primary",
-        className: "text-primary hover:underline",
+        className:
+          "bg-transparent text-primary hover:underline hover:bg-transparent",
       },
       {
         variant: "link",
         color: "secondary",
-        className: "text-secondary hover:underline",
+        className:
+          "bg-transparent text-secondary hover:underline hover:bg-transparent",
       },
       {
         variant: "link",
         color: "progress",
-        className: "text-progress hover:underline",
+        className:
+          "bg-transparent text-progress hover:underline hover:bg-transparent",
       },
       {
         variant: "link",
         color: "success",
-        className: "text-success hover:underline",
+        className:
+          "bg-transparent text-success hover:underline hover:bg-transparent",
       },
       {
         variant: "link",
         color: "error",
-        className: "text-error hover:underline",
+        className:
+          "bg-transparent text-error hover:underline hover:bg-transparent",
+      },
+      // Text + Color
+      {
+        variant: "text",
+        color: "primary",
+        className:
+          "bg-transparent text-primary hover:font-bold hover:bg-transparent",
+      },
+      {
+        variant: "text",
+        color: "secondary",
+        className:
+          "bg-transparent text-secondary hover:font-bold hover:bg-transparent",
+      },
+      {
+        variant: "text",
+        color: "progress",
+        className:
+          "bg-transparent text-progress hover:font-bold hover:bg-transparent",
+      },
+      {
+        variant: "text",
+        color: "success",
+        className:
+          "bg-transparent text-success hover:font-bold hover:bg-transparent",
+      },
+      {
+        variant: "text",
+        color: "error",
+        className:
+          "bg-transparent text-error hover:font-bold hover:bg-transparent",
       },
     ],
   }
