@@ -24,7 +24,6 @@ export default function LoginForm({
 
     try {
       const { session } = await loginMemberApi({ email, password });
-      console.log(session);
       setSession(session);
       router.push("/");
     } catch (err) {

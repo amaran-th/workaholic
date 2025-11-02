@@ -66,7 +66,6 @@ export async function GET(req: Request) {
 
     const processedTasks = tasks.map((task) => {
       const { taskPositions, ...rest } = task;
-      console.log("test", taskPositions);
       return {
         ...rest,
         positionX: taskPositions?.[0]?.positionX,

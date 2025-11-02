@@ -336,7 +336,6 @@ function DateTimePicker({
         value={time}
         className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         onChange={(event) => {
-          console.log(event.target.value);
           setTime(event.target.value);
         }}
       />

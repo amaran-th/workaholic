@@ -565,7 +565,7 @@ export default function useMatrixFlow(
         "bottom-right",
       ].includes(node.id)
     ) {
-      console.log("센터 드래그 종료:", node.position);
+      // console.log("센터 드래그 종료:", node.position);
 
       // 1) API 호출해서 새 좌표 저장
       updatePosition.mutate({
@@ -573,7 +573,7 @@ export default function useMatrixFlow(
         ...localCenterPosition,
       });
     } else if (node.type === "task") {
-      console.log("업무 드래그 종료:", node, selectedDate, node.position);
+      // console.log("업무 드래그 종료:", node, selectedDate, node.position);
       patchTask.mutate({
         taskId: node.id,
         data: {

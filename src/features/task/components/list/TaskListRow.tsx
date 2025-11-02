@@ -108,7 +108,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
     <TableRow
       key={task.id}
       className="cursor-pointer hover:bg-accent transition-colors"
-      onClick={() => console.log("Task 클릭:", task.id)}
+      // onClick={() => console.log("Task 클릭:", task.id)}
     >
       <TableCell align="center">
         {priorityColor ? (

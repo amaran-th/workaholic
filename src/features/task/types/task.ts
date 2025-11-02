@@ -64,6 +64,7 @@ export type PostTaskRequest = {
   categoryId: string | null;
   parentTaskId: string | null;
   sprintId: string | null;
+  date: string | null;
 };
 
 export type PatchTaskRequest = Partial<{

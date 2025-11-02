@@ -40,8 +40,6 @@ function TaskList() {
     enabled: !!session?.user?.id,
   });
 
-  console.log(tasks);
-
   // const getTaskStatus = useCallback(
   //   (startDate: string | null, endDate: string | null) => {
   //     if (!selectedDate) return null;

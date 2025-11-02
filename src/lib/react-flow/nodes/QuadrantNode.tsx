@@ -13,7 +13,11 @@ import { NodeProps, useReactFlow } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { Plus } from "lucide-react";
 import { MouseEvent, useState } from "react";
-import { defaultCategoryIdAtom, taskFilterAtom } from "../store/matrixAtom";
+import {
+  defaultCategoryIdAtom,
+  selectedDateAtom,
+  taskFilterAtom,
+} from "../store/matrixAtom";
 
 function QuadrantNode({
   data,
@@ -25,6 +29,7 @@ function QuadrantNode({
   } | null>(null);
   const [session] = useAtom(sessionAtom);
   const [defaultCategoryId] = useAtom(defaultCategoryIdAtom);
+  const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
   const addTask = useMutation({
@@ -52,6 +57,7 @@ function QuadrantNode({
     if (!contextPos) return;
 
     addTask.mutate({
+      date: selectedDate?.format("YYYY-MM-DD") ?? null,
       memberId: session!.user.id!,
       categoryId: defaultCategoryId,
       ...contextPos,

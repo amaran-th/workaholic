@@ -16,7 +16,7 @@ import { Color } from "@/lib/data";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import CategoryItem from "./CategoryItem";
 import ColorPicker from "./ColorPicker";
 
@@ -36,10 +36,6 @@ function MyCategory() {
         queryKey: ["categories", { memberId }],
       }),
   });
-
-  useEffect(() => {
-    console.log(data?.map((a) => a.id));
-  }, [data]);
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;

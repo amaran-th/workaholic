@@ -8,7 +8,6 @@ export const formatDDayString = (
   if (!criteria || !targetDate) return "";
 
   const target = dayjs.tz(targetDate, "Asia/Seoul");
-  console.log(criteria, target);
 
   const diffDays = target.startOf("day").diff(criteria.startOf("day"), "day");
   const diffHours = target.diff(criteria, "hour");

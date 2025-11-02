@@ -63,7 +63,6 @@ function MyProfile() {
   useEffect(() => {
     if (!data) return;
     setForm({ name: data.name ?? "", bio: data.bio ?? "" });
-    console.log(data);
   }, [data]);
 
   const handleChange = useCallback(
