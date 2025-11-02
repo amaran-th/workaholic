@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       categoryId,
       parentTaskId,
       sprintId,
+      date,
     } = body;
 
     // member별로 no를 자동 증가
@@ -39,9 +40,10 @@ export async function POST(req: NextRequest) {
           create: {
             positionX,
             positionY,
-            date: dayjs().format(), // TODO 오늘 날짜가 아닐 수도 있음
+            date: date ? date : dayjs().tz("Asia/Seoul").format("YYYY-MM-DD"),
           },
         },
+        ...(date ? { createdAt: dayjs(date).format() } : {}),
       },
     });
 
