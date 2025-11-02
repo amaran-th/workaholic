@@ -21,13 +21,15 @@ export const formatDDayString = (
 export const convertKSTDateToUTC = (dateStr: string) => {
   if (!dateStr) throw new Error("dateStr is required");
 
-  const kst = dayjs.tz(dateStr, "Asia/Seoul");
-  const startUTC = kst.startOf("day");
-  const endUTC = kst.endOf("day");
+  const kstDate = dayjs.tz(dateStr.slice(0, 11));
+  const startOfKSTDay = kstDate.startOf("day");
+  const endOfKSTDay = kstDate.endOf("day");
 
+  const startUTC = startOfKSTDay.utc().format(); // 2025-11-02T15:00:00Z
+  const endUTC = endOfKSTDay.utc().format();
   return {
-    startUTC: startUTC.toDate(),
-    UTC: kst.toDate(),
-    endUTC: endUTC.toDate(),
+    startUTC,
+    UTC: dateStr,
+    endUTC,
   };
 };

@@ -71,7 +71,7 @@ export async function GET(req: Request) {
         doStamps: true,
         taskPositions: {
           where: {
-            date: { lte: endUTC.toISOString() },
+            date: { lte: endUTC },
           },
           orderBy: { date: "desc" },
           take: 1,

@@ -4,18 +4,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: taskId } = params;
+    const { id: taskId } = await context.params;
     const { date } = await req.json(); // YYYY-MM-DDTHH:mm:ss KST
     if (!date) return new NextResponse("date is required", { status: 400 });
 
-    const { startUTC, UTC, endUTC } = convertKSTDateToUTC(date);
+    const { startUTC, endUTC } = convertKSTDateToUTC(date);
 
     const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (!task) throw new Error("Task not found");
-
+    console.log("test", date, startUTC, endUTC);
     // 특정 날짜의 doStamp 확인
     const sameDayStamp = await prisma.doStamp.findFirst({
       where: {
@@ -48,7 +48,7 @@ export async function POST(
     const updatedTask = await prisma.task.update({
       where: { id: taskId },
       data: {
-        endDate: task.endDate === null ? UTC : null,
+        endDate: task.endDate === null ? date : null,
       },
     });
 

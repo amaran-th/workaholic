@@ -5,15 +5,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: taskId } = params;
+    const { id: taskId } = await context.params;
     const { date } = await req.json(); // YYYY-MM-DDTHH:mm:ss KST
     if (!taskId || !date)
       return new NextResponse("task id and date is required", { status: 400 });
 
-    const { startUTC, UTC, endUTC } = convertKSTDateToUTC(date);
+    const { startUTC, endUTC } = convertKSTDateToUTC(date);
 
     // 해당 날짜에 도장 존재 여부 확인
     const existingStamp = await prisma.doStamp.findFirst({
@@ -29,7 +29,7 @@ export async function POST(
     if (!existingStamp) {
       // 도장 생성
       const newStamp = await prisma.doStamp.create({
-        data: { taskId, createdAt: UTC },
+        data: { taskId, createdAt: date },
       });
 
       // 가장 빠른 도장 찾기 → startDate 조정

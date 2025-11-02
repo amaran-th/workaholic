@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { CalendarSelect } from "@/components/ui/calendar";
 import { CellInput } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,11 +24,17 @@ import {
   selectedDateAtom,
   taskFilterAtom,
 } from "@/lib/react-flow/store/matrixAtom";
+import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { Pin, PinOff, Trash2 } from "lucide-react";
-import { useCallback, useMemo } from "react";
-import { deleteTaskApi, patchTaskApi } from "../../task-api";
+import { Check, Pin, PinOff, RefreshCw, Trash2 } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import {
+  deleteTaskApi,
+  patchTaskApi,
+  toggleCompleteStamp,
+  toggleDoingStamp,
+} from "../../task-api";
 import {
   DayTaskStatus,
   PatchTaskRequest,
@@ -34,13 +45,14 @@ import { DayStatusBadge } from "./StatusBadge";
 function TaskListRow({ task }: { task: TaskListItem }) {
   const queryClient = useQueryClient();
   const [session] = useAtom(sessionAtom);
-
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
+  const [open, setOpen] = useState<boolean>(false);
+
   const { data: categories } = useGetCategoriesQuery({
     memberId: session?.user.id ?? "",
   });
-  const { data: sprints, isFetching } = useGetSprintQuery({
+  const { data: sprints } = useGetSprintQuery({
     memberId: session?.user.id,
     categoryId: task.category?.id,
   });
@@ -62,6 +74,35 @@ function TaskListRow({ task }: { task: TaskListItem }) {
 
   const deleteTask = useMutation({
     mutationFn: ({ taskId }: { taskId: string }) => deleteTaskApi({ taskId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+  });
+
+  const toggleDoing = useMutation({
+    mutationFn: ({
+      taskId,
+      params,
+    }: {
+      taskId: string;
+      params: { date: string };
+    }) => toggleDoingStamp({ taskId, params }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+  });
+  const toggleComplete = useMutation({
+    mutationFn: ({
+      taskId,
+      params,
+    }: {
+      taskId: string;
+      params: { date: string };
+    }) => toggleCompleteStamp({ taskId, params }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["list-tasks", taskFilter],
@@ -130,7 +171,74 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell align="center">
-        <DayStatusBadge status={getDayTaskStatus(task)} />
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <div>
+              <DayStatusBadge status={getDayTaskStatus(task)} />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="flex gap-2 p-2 w-fit bg-white shadow-lg rounded-md">
+            <Button
+              onClick={() => {
+                toggleDoing.mutate({
+                  taskId: task.id,
+                  params: {
+                    date:
+                      !selectedDate || dayjs().isSame(selectedDate, "day")
+                        ? dayjs().format()
+                        : selectedDate.format(),
+                  },
+                });
+              }}
+              color="progress"
+              variant={
+                getDayTaskStatus(task) === DayTaskStatus.DOING
+                  ? "default"
+                  : "outline"
+              }
+              disabled={getDayTaskStatus(task) === DayTaskStatus.COMPLETED}
+            >
+              <RefreshCw
+                className={cn("text-progress", {
+                  "text-white": getDayTaskStatus(task) === DayTaskStatus.DOING,
+                })}
+              />
+              작업 중
+            </Button>
+            <Button
+              onClick={() => {
+                toggleComplete.mutate({
+                  taskId: task.id,
+                  params: {
+                    date:
+                      !selectedDate || dayjs().isSame(selectedDate, "day")
+                        ? dayjs().format()
+                        : selectedDate.format(),
+                  },
+                });
+              }}
+              color="success"
+              variant={
+                getDayTaskStatus(task) === DayTaskStatus.COMPLETED
+                  ? "default"
+                  : "outline"
+              }
+              disabled={
+                ![DayTaskStatus.DOING, DayTaskStatus.COMPLETED].includes(
+                  getDayTaskStatus(task)
+                )
+              }
+            >
+              <Check
+                className={cn("text-success", {
+                  "text-white":
+                    getDayTaskStatus(task) === DayTaskStatus.COMPLETED,
+                })}
+              />
+              작업 완료
+            </Button>
+          </PopoverContent>
+        </Popover>
       </TableCell>
       <TableCell>
         <Select
