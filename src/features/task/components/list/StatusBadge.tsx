@@ -1,7 +1,22 @@
 import { Check, Loader, Pause, RefreshCw, Snowflake } from "lucide-react";
-import { TaskStatus } from "../../types/task";
+import { DayTaskStatus, TaskStatus } from "../../types/task";
 
-function StatusBadge({ status }: { status: TaskStatus }) {
+function DayStatusBadge({ status }: { status: DayTaskStatus | null }) {
+  if (!status) return null;
+  return {
+    [DayTaskStatus.TODO]: (
+      <Loader className="bg-divider text-white rounded-full p-1" />
+    ),
+    [DayTaskStatus.DOING]: (
+      <RefreshCw className="bg-progress text-white rounded-full p-1" />
+    ),
+    [DayTaskStatus.COMPLETED]: (
+      <Check className="bg-success text-white rounded-full p-1" />
+    ),
+  }[status];
+}
+function StatusBadge({ status }: { status: TaskStatus | null }) {
+  if (!status) return null;
   return {
     [TaskStatus.TODO]: (
       <Loader className="bg-divider text-white rounded-full p-1" />
@@ -21,4 +36,4 @@ function StatusBadge({ status }: { status: TaskStatus }) {
   }[status];
 }
 
-export default StatusBadge;
+export { DayStatusBadge, StatusBadge };

@@ -16,17 +16,15 @@ export default function Header() {
 
   return (
     <div
-      className={cn(
-        "bg-black text-white flex p-2 items-center gap-4",
-        `h-[${HEADER_HEIGHT}px]`
-      )}
+      className={cn("bg-black text-white flex p-2 items-center gap-4")}
+      style={{ height: HEADER_HEIGHT }}
     >
       <div className="">
         <Link href="/">일을:하자</Link>
       </div>
       <div className="flex-1 rounded-3xl bg-gray-600 p-1 px-4">광고</div>
       <div className="">
-        {session?.access_token ? (
+        {!!session?.access_token ? (
           <div className="flex gap-1">
             <NavigationButton />
             <MyButton />

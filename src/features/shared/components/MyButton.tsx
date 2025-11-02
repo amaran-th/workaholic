@@ -36,7 +36,7 @@ export default function MyButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button>MY</Button>
+        <Button asChild>MY</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => router.push("/my")}>

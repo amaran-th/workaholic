@@ -1,11 +1,9 @@
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { TaskFilter } from "@/features/task/types/task";
-import { formatDateTimeStringData } from "@/lib/utils/formatDate";
+import dayjs, { Dayjs } from "@/lib/dayjs";
 import { atom } from "jotai";
 
-export const selectedDateAtom = atom<string | undefined>(
-  formatDateTimeStringData(new Date())
-);
+export const selectedDateAtom = atom<Dayjs | null>(dayjs());
 
 export const selectedCategoryIdAtom = atom<string | null>(null);
 export const defaultCategoryIdAtom = atom<string | null>(null);
@@ -18,6 +16,6 @@ export const taskFilterAtom = atom<TaskFilter>((get) => {
   return {
     memberId: session?.user?.id ?? "",
     categoryId: selectedCategoryId,
-    date: today,
+    date: today?.format("YYYY-MM-DD"),
   };
 });

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { DateTimePicker } from "@/components/ui/calendar";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,7 +10,6 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -48,13 +47,7 @@ import {
   PatchTaskRequest,
   TaskWithRelations,
 } from "@/features/task/types/task";
-import {
-  formatDateString,
-  formatDateTimeString,
-  formatDateTimeStringData,
-  formatKoreanDate,
-  isSameDay,
-} from "@/lib/utils/formatDate";
+import dayjs from "@/lib/dayjs";
 import {
   defaultCategoryIdAtom,
   selectedDateAtom,
@@ -72,7 +65,7 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
 
   const { data: sprints } = useGetSprintQuery({
     memberId: session?.user.id ?? "",
-    categoryId: task.category.id,
+    categoryId: task.category?.id,
   });
 
   const patchTask = useMutation({
@@ -151,8 +144,13 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
                 <div className="flex flex-col">
                   <p>{sprint.name}</p>
                   <p className="text-secondary text-xs">
-                    {formatKoreanDate(sprint.startDate)}~
-                    {formatKoreanDate(sprint.endDate)}
+                    {sprint.startDate
+                      ? dayjs(sprint.startDate).format("YYYY-MM-DD")
+                      : ""}
+                    ~
+                    {sprint.endDate
+                      ? dayjs(sprint.endDate).format("YYYY-MM-DD")
+                      : ""}
                   </p>
                 </div>
               </SelectItem>
@@ -225,13 +223,16 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   });
 
   const isDoing = useMemo(
-    () => data.doStamps.some((stamp) => isSameDay(stamp.createdAt)),
-    [data.doStamps]
+    () =>
+      data.doStamps.some((stamp) =>
+        dayjs(stamp.createdAt).isSame(selectedDate, "day")
+      ),
+    [data.doStamps, selectedDate]
   );
   const isCompleted = useMemo(() => {
     if (!data.endDate) return false;
-    return isSameDay(data.endDate);
-  }, [data.endDate]);
+    return dayjs(data.endDate).isSame(selectedDate, "day");
+  }, [data.endDate, selectedDate]);
 
   return (
     <ContextMenu>
@@ -248,10 +249,9 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 taskId: data.id,
                 params: {
                   date:
-                    !selectedDate ||
-                    formatDateString(new Date()) === selectedDate
-                      ? formatDateTimeStringData(new Date())
-                      : selectedDate,
+                    !selectedDate || dayjs().isSame(selectedDate, "day")
+                      ? dayjs().format()
+                      : selectedDate.format(),
                 },
               });
             }}
@@ -272,10 +272,9 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 taskId: data.id,
                 params: {
                   date:
-                    !selectedDate ||
-                    formatDateString(new Date()) === selectedDate
-                      ? formatDateTimeStringData(new Date())
-                      : selectedDate,
+                    !selectedDate || dayjs().isSame(selectedDate, "day")
+                      ? dayjs().format()
+                      : selectedDate.format(),
                 },
               });
             }}
@@ -305,7 +304,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
               <p>Due Date</p>
               {data.dueDate ? (
                 <p className="text-xs text-sub-text">
-                  {formatDateTimeString(new Date(data.dueDate))}
+                  {dayjs(data.dueDate)?.format("YYYY-MM-DD HH:mm")}
                 </p>
               ) : (
                 <p className="text-xs text-placeholder">YYYY-MM-DD HH:mm</p>
@@ -313,74 +312,21 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             </div>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
-            <div className="p-2">
-              <Calendar
-                mode="single"
-                selected={dueDate ? new Date(dueDate) : undefined}
-                onSelect={(newValue) => {
-                  setDueDate((prev) => {
-                    if (!newValue) return prev;
-                    if (prev) {
-                      return formatDateString(newValue).concat(
-                        prev.slice(10, 16)
-                      );
-                    }
-                    return formatDateTimeString(newValue);
-                  });
-                }}
-                className=""
-                captionLayout="dropdown"
-              />
-              <Input
-                type="time"
-                id="time-picker"
-                step="1"
-                value={
-                  dueDate
-                    ? new Date(dueDate).toLocaleTimeString("ko-KR", {
-                        hour12: false,
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        timeZone: "Asia/Seoul",
-                      })
-                    : "00:00:00"
-                }
-                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                onChange={(event) => {
-                  console.log(event.target.value);
-                  setDueDate((prev) => {
-                    return (prev ?? formatDateTimeString(new Date()))
-                      .slice(0, 11)
-                      .concat(event.target.value);
-                  });
-                }}
-              />
-              <div className="flex gap-1 w-full justify-end mt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    patchTask.mutate({
-                      taskId: data.id,
-                      data: { dueDate: null },
-                    });
-                  }}
-                >
-                  초기화
-                </Button>
-                <Button
-                  onClick={() => {
-                    patchTask.mutate({
-                      taskId: data.id,
-                      data: { dueDate: new Date(dueDate!) },
-                    });
-                  }}
-                  disabled={!dueDate}
-                >
-                  설정
-                </Button>
-              </div>
-            </div>
+            <DateTimePicker
+              value={dayjs(dueDate)}
+              onClear={() => {
+                patchTask.mutate({
+                  taskId: data.id,
+                  data: { dueDate: null },
+                });
+              }}
+              onSubmit={(newValue: string) => {
+                patchTask.mutate({
+                  taskId: data.id,
+                  data: { dueDate: newValue },
+                });
+              }}
+            />
           </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />

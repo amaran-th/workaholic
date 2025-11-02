@@ -10,6 +10,7 @@ import {
 import { Category } from "@/features/category/types/category";
 import { postSprintApi, useGetSprintQuery } from "@/features/sprint/sprint-api";
 import { Color } from "@/lib/data";
+import dayjs from "@/lib/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Pencil, Plus, Reply, Save, Trash2 } from "lucide-react";
@@ -223,22 +224,30 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
                 <div className="flex gap-2">
                   <CalendarSelect
                     label="시작일"
-                    date={newSprintForm.startDate}
+                    selectedDate={
+                      newSprintForm.startDate
+                        ? dayjs(newSprintForm.startDate)
+                        : null
+                    }
                     onSelect={(newValue) => {
                       handleSprintFormChange(
                         "startDate",
-                        newValue?.toISOString() ?? null
+                        newValue?.format() ?? null
                       );
                     }}
                     buttonProps={{ size: "sm", color: "secondary" }}
                   />
                   <CalendarSelect
                     label="종료일"
-                    date={newSprintForm.endDate}
+                    selectedDate={
+                      newSprintForm.endDate
+                        ? dayjs(newSprintForm.endDate)
+                        : null
+                    }
                     onSelect={(newValue) => {
                       handleSprintFormChange(
                         "endDate",
-                        newValue?.toISOString() ?? null
+                        newValue?.format() ?? null
                       );
                     }}
                     buttonProps={{ size: "sm", color: "secondary" }}

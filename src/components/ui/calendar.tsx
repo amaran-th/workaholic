@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { formatKoreanDate } from "@/lib/utils/formatDate";
+import dayjs, { Dayjs } from "@/lib/dayjs";
 import { cn } from "@/lib/utils/utils";
 import { VariantProps } from "class-variance-authority";
 import {
@@ -12,6 +12,7 @@ import {
 import * as React from "react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
+import { Input } from "./input";
 import { Label } from "./label";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
@@ -185,11 +186,13 @@ function CalendarDayButton({
   ...props
 }: React.ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames();
-
   const ref = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
+
+  const dayObj = dayjs(day.date);
+  const label = dayObj.format("D"); // 날짜 숫자만
 
   return (
     <Button
@@ -212,7 +215,9 @@ function CalendarDayButton({
         className
       )}
       {...props}
-    />
+    >
+      {label}
+    </Button>
   );
 }
 
@@ -220,9 +225,9 @@ interface CalendarSelectProps {
   label?: string;
   placeholder?: string;
   readonly?: boolean;
-  date: string | null;
-  onSelect: (newValue: Date | undefined) => void;
-  cell?: boolean; // focusing되지 않은 상태에서는 일반 텍스트처럼 보이도록 할지
+  selectedDate: Dayjs | null; // "YYYY-MM-DD" 또는 ISO 문자열
+  onSelect: (newValue: Dayjs | null) => void;
+  cell?: boolean;
   buttonProps?: VariantProps<typeof buttonVariants>;
 }
 
@@ -230,12 +235,12 @@ function CalendarSelect({
   label,
   placeholder,
   readonly,
-  date,
+  selectedDate,
   onSelect,
   cell,
   buttonProps,
 }: CalendarSelectProps) {
-  const [open, setOpen] = React.useState<boolean>(false);
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="flex flex-col w-full max-w-36 gap-1">
@@ -244,9 +249,10 @@ function CalendarSelect({
           {label}
         </Label>
       )}
+
       {readonly ? (
         <p className="text-xs text-secondary leading-8">
-          {date ? formatKoreanDate(date) : "미정"}
+          {selectedDate ? selectedDate.format("YYYY-MM-DD") : "미정"}
         </p>
       ) : (
         <Popover open={open} onOpenChange={setOpen}>
@@ -260,17 +266,18 @@ function CalendarSelect({
               {...buttonProps}
               color={buttonProps?.color ?? undefined}
             >
-              {date ? formatKoreanDate(date) : placeholder ?? "날짜 선택"}
+              {selectedDate
+                ? selectedDate.format("YYYY-MM-DD")
+                : placeholder ?? "날짜 선택"}
               {(!cell || open) && <ChevronDownIcon />}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date ? new Date(date) : undefined}
-              onSelect={onSelect}
-              className="rounded-md border shadow-sm"
-              captionLayout="dropdown"
+            <SingleCalendar
+              selected={selectedDate}
+              onSelect={(newDate) => {
+                onSelect(newDate);
+              }}
             />
           </PopoverContent>
         </Popover>
@@ -279,4 +286,82 @@ function CalendarSelect({
   );
 }
 
-export { Calendar, CalendarDayButton, CalendarSelect };
+function SingleCalendar({
+  selected,
+  onSelect,
+}: {
+  selected: Dayjs | null;
+  onSelect: (value: Dayjs | null) => void;
+}) {
+  return (
+    <Calendar
+      mode="single"
+      selected={selected ? selected.toDate() : undefined}
+      onSelect={(newValue) => {
+        if (!newValue) return;
+        onSelect(dayjs(newValue));
+      }}
+    />
+  );
+}
+
+function DateTimePicker({
+  value,
+  onClear,
+  onSubmit,
+}: {
+  value: Dayjs | null;
+  onClear?: () => void;
+  onSubmit: (newValue: string) => void;
+}) {
+  const [date, setDate] = React.useState<string | null>(
+    (value ?? dayjs()).format("YYYY-MM-DD")
+  );
+  const [time, setTime] = React.useState<string>(
+    value?.format("HH:mm:ss") ?? "00:00:00"
+  );
+
+  return (
+    <div className="p-2">
+      <SingleCalendar
+        selected={dayjs(date)}
+        onSelect={(newValue) => {
+          setDate(newValue ? newValue.format("YYYY-MM-DD") : null);
+        }}
+      />
+      <Input
+        type="time"
+        id="time-picker"
+        step="1"
+        value={time}
+        className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        onChange={(event) => {
+          console.log(event.target.value);
+          setTime(event.target.value);
+        }}
+      />
+      <div className="flex gap-1 w-full justify-end mt-2">
+        {!!onClear && (
+          <Button
+            variant="outline"
+            onClick={() => {
+              onClear();
+            }}
+          >
+            초기화
+          </Button>
+        )}
+        <Button
+          onClick={() => {
+            onSubmit(dayjs(`${date}T${time}`).format());
+          }}
+          disabled={!date || !time}
+        >
+          설정
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export { Calendar, CalendarSelect, DateTimePicker, SingleCalendar };

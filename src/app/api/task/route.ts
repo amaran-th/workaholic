@@ -1,5 +1,5 @@
+import dayjs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
-import { formatDateString } from "@/lib/utils/formatDate";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
           create: {
             positionX,
             positionY,
-            date: formatDateString(new Date()),
+            date: dayjs().format(), // TODO 오늘 날짜가 아닐 수도 있음
           },
         },
       },

@@ -19,6 +19,10 @@ export async function GET(req: Request) {
     if (categoryId) where.categoryId = categoryId;
     if (sprintId) where.sprintId = sprintId;
 
+    if (!date) {
+      return new NextResponse("date are required", { status: 400 });
+    }
+
     // ✅ from~to: 기간 교차 필터링 (겹치는 모든 task 포함)
     if (from && to) {
       const { startUTC: fromDate } = convertKSTDateToUTC(from);
@@ -32,20 +36,25 @@ export async function GET(req: Request) {
       ];
     }
 
-    if (date) {
-      const { startUTC, endUTC } = convertKSTDateToUTC(date);
-      where.AND = [
-        ...(where.AND ?? []),
-        { createdAt: { lte: endUTC } },
-        { OR: [{ endDate: { gte: startUTC } }, { endDate: null }] },
-      ];
-    }
+    const { startUTC, endUTC } = convertKSTDateToUTC(date);
+    where.AND = [
+      ...(where.AND ?? []),
+      { createdAt: { lte: endUTC } },
+      { OR: [{ endDate: { gte: startUTC } }, { endDate: null }] },
+    ];
 
     let member = null;
     if (memberId) {
       member = await prisma.member.findUnique({
         where: { id: memberId },
-        select: { left: true, right: true, top: true, bottom: true },
+        select: {
+          centerX: true,
+          centerY: true,
+          left: true,
+          right: true,
+          top: true,
+          bottom: true,
+        },
       });
     }
 
@@ -60,13 +69,13 @@ export async function GET(req: Request) {
           select: { id: true, content: true },
         },
         doStamps: true,
-        taskPositions: date
-          ? {
-              where: { date: { lte: date } },
-              orderBy: { date: "desc" },
-              take: 1,
-            }
-          : false,
+        taskPositions: {
+          where: {
+            date: { lte: endUTC.toISOString() },
+          },
+          orderBy: { date: "desc" },
+          take: 1,
+        },
       },
       orderBy: { createdAt: "asc" },
     });
@@ -84,7 +93,15 @@ export async function GET(req: Request) {
           posY <= member.bottom) ||
           (posX === undefined && posY === undefined));
 
-      return { ...rest, pinned: !!isPinned };
+      let priority = null;
+      if (member && isPinned) {
+        if (posX <= member.centerX && posY <= member.centerY) priority = 1;
+        else if (posX > member.centerX && posY <= member.centerY) priority = 2;
+        else if (posX <= member.centerX && posY > member.centerY) priority = 3;
+        else if (posX > member.centerX && posY > member.centerY) priority = 4;
+      }
+
+      return { ...rest, pinned: !!isPinned, priority };
     });
 
     return NextResponse.json(tasksWithPin);

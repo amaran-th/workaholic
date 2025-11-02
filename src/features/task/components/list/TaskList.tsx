@@ -1,7 +1,4 @@
-import { Badge, CategoryBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { CalendarSelect } from "@/components/ui/calendar";
-import { CellInput } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -25,25 +22,11 @@ import {
   selectedDateAtom,
   taskFilterAtom,
 } from "@/lib/react-flow/store/matrixAtom";
-import {
-  formatDateString,
-  formatDateTimeStringData,
-  formatKoreanDate,
-} from "@/lib/utils/formatDate";
-import { cn } from "@/lib/utils/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { Pin, Trash2 } from "lucide-react";
-import {
-  deleteTaskApi,
-  patchTaskApi,
-  useGetListTasksQuery,
-} from "../../task-api";
-import { PatchTaskRequest, TaskStatus } from "../../types/task";
-import StatusBadge from "./StatusBadge";
+import { useGetListTasksQuery } from "../../task-api";
+import TaskListRow from "./TaskListRow";
 
 function TaskList() {
-  const queryClient = useQueryClient();
   const [session] = useAtom(sessionAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [selectedCategoryId, setSelectedCategoryId] = useAtom(
@@ -57,60 +40,39 @@ function TaskList() {
     enabled: !!session?.user?.id,
   });
 
-  const patchTask = useMutation({
-    mutationFn: ({
-      taskId,
-      data,
-    }: {
-      taskId: string;
-      data: PatchTaskRequest;
-    }) => patchTaskApi({ taskId, data }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["list-tasks", taskFilter],
-      });
-    },
-  });
+  console.log(tasks);
 
-  const deleteTask = useMutation({
-    mutationFn: ({ taskId }: { taskId: string }) => deleteTaskApi({ taskId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["list-tasks", taskFilter],
-      });
-    },
-  });
-
-  const getTaskStatus = (startDate: string | null, endDate: string | null) => {
-    if (endDate) return TaskStatus.COMPLETED;
-    if (startDate) return TaskStatus.DOING;
-    return TaskStatus.TODO;
-  };
+  // const getTaskStatus = useCallback(
+  //   (startDate: string | null, endDate: string | null) => {
+  //     if (!selectedDate) return null;
+  //     if (endDate && dayjs(endDate).isSameOrBefore(selectedDate, "day"))
+  //       return TaskStatus.COMPLETED;
+  //     if (startDate && dayjs(startDate).isSameOrBefore(selectedDate, "day"))
+  //       return TaskStatus.DOING;
+  //     return TaskStatus.TODO;
+  //   },
+  //   [selectedDate]
+  // );
 
   return (
     <>
-      <div className="flex gap-2 justify-end">
-        <div className="flex gap-1">
-          <CalendarSelect
-            date={selectedDate ?? null}
-            onSelect={(newValue) => {
-              setSelectedDate((prev) => {
-                if (!newValue) return prev;
-                return formatDateString(newValue);
-              });
-            }}
-          />
-          <Button
+      <div className="flex gap-2 justify-between">
+        <h2 className="text-2xl font-bold">오늘의 업무</h2>
+        <CalendarSelect
+          selectedDate={selectedDate ?? null}
+          onSelect={(newValue) => {
+            if (!newValue) return;
+            setSelectedDate(newValue);
+          }}
+        />
+        {/* <Button
             onClick={() => {
-              setSelectedDate((prev) =>
-                prev ? undefined : formatDateTimeStringData(new Date())
-              );
+              setSelectedDate((prev) => (prev ? null : dayjs()));
             }}
             size="sm"
           >
             {selectedDate ? "전체 보기" : "오늘 업무만"}
-          </Button>
-        </div>
+          </Button> */}
       </div>
       <div className="flex gap-1">
         <Select
@@ -124,7 +86,7 @@ function TaskList() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">
-              <div className="flex items-center gap-2">전체</div>
+              <div className="flex items-center gap-2">전체 카테고리</div>
             </SelectItem>
             {categories?.map((category) => (
               <SelectItem key={category.id} value={category.id}>
@@ -172,99 +134,7 @@ function TaskList() {
                 </TableCell>
               </TableRow>
             ) : tasks?.length ? (
-              tasks.map((task) => (
-                <TableRow
-                  key={task.id}
-                  className="cursor-pointer hover:bg-accent transition-colors"
-                  onClick={() => console.log("Task 클릭:", task.id)}
-                >
-                  <TableCell align="center">
-                    <Pin
-                      className={cn("text-divider", {
-                        "text-error": task.pinned,
-                      })}
-                    />
-                  </TableCell>
-                  <TableCell className="text-secondary">#{task.no}</TableCell>
-                  <TableCell className="font-medium truncate">
-                    <CellInput
-                      defaultValue={task.content ?? ""}
-                      onSubmit={(value) => {
-                        patchTask.mutate({
-                          taskId: task.id,
-                          data: { content: String(value) },
-                        });
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <StatusBadge
-                      status={getTaskStatus(task.startDate, task.endDate)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CategoryBadge customColor={task.category.color}>
-                      {task.category.name}
-                    </CategoryBadge>
-                  </TableCell>
-                  <TableCell>
-                    {task.sprint ? (
-                      <Badge variant="secondary" className="bg-gray-200">
-                        {task.sprint.name}
-                      </Badge>
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
-                  <TableCell>{formatKoreanDate(task.startDate, "-")}</TableCell>
-                  <TableCell>{formatKoreanDate(task.endDate, "-")}</TableCell>
-                  <TableCell>
-                    <CalendarSelect
-                      date={task.dueDate}
-                      placeholder="-"
-                      onSelect={(newValue) => {
-                        patchTask.mutate({
-                          taskId: task.id,
-                          data: { dueDate: newValue },
-                        });
-                      }}
-                      cell
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CellInput
-                      defaultValue={task.memo ?? ""}
-                      onSubmit={(value) => {
-                        patchTask.mutate({
-                          taskId: task.id,
-                          data: { memo: String(value) },
-                        });
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CellInput
-                      defaultValue={task.comment ?? ""}
-                      onSubmit={(value) => {
-                        patchTask.mutate({
-                          taskId: task.id,
-                          data: { comment: String(value) },
-                        });
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell className="flex justify-center">
-                    <Button
-                      color="error"
-                      onClick={() => {
-                        deleteTask.mutate({ taskId: task.id });
-                      }}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              tasks.map((task) => <TaskListRow key={task.id} task={task} />)
             ) : (
               <TableRow>
                 <TableCell

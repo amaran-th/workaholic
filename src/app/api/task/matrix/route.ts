@@ -37,11 +37,11 @@ export async function GET(req: Request) {
       ];
     }
 
-    const { startUTC: targetDate } = convertKSTDateToUTC(date);
+    const { startUTC, endUTC } = convertKSTDateToUTC(date);
     where.AND = [
       ...(where.AND ?? []),
-      { createdAt: { lte: targetDate } },
-      { OR: [{ endDate: { gte: targetDate } }, { endDate: null }] },
+      { createdAt: { lte: endUTC } },
+      { OR: [{ endDate: { gte: startUTC } }, { endDate: null }] },
     ];
 
     const tasks = await prisma.task.findMany({
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
         },
         doStamps: true,
         taskPositions: {
-          where: { date: { lte: date } },
+          where: { date: { lte: endUTC.toISOString() } },
           orderBy: { date: "desc" },
           take: 1,
         },
@@ -66,6 +66,7 @@ export async function GET(req: Request) {
 
     const processedTasks = tasks.map((task) => {
       const { taskPositions, ...rest } = task;
+      console.log("test", taskPositions);
       return {
         ...rest,
         positionX: taskPositions?.[0]?.positionX,

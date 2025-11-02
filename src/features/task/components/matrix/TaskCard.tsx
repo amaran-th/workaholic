@@ -1,7 +1,10 @@
 import { CategoryBadge } from "@/components/ui/badge";
 import { Card, CardDescription } from "@/components/ui/card";
 import { colorMap } from "@/lib/data";
-import { taskFilterAtom } from "@/lib/react-flow/store/matrixAtom";
+import {
+  selectedDateAtom,
+  taskFilterAtom,
+} from "@/lib/react-flow/store/matrixAtom";
 import { formatDDayString } from "@/lib/utils/formatDate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
@@ -28,6 +31,7 @@ function TaskCard({
 }) {
   const queryClient = useQueryClient();
   const [taskFilter] = useAtom(taskFilterAtom);
+  const [selectedDate] = useAtom(selectedDateAtom);
   const [text, setText] = useState<string>(data.content);
 
   const patchTask = useMutation({
@@ -53,6 +57,11 @@ function TaskCard({
     return <></>;
   }, [isCompleted, isDoing]);
 
+  const DDayText = useMemo(
+    () => formatDDayString(selectedDate, data.dueDate),
+    [data.dueDate, selectedDate]
+  );
+
   return (
     <Card
       className="w-[200px] min-h-[150px] rounded-t-none p-3 gap-1"
@@ -60,14 +69,12 @@ function TaskCard({
         backgroundColor: colorMap[data.category?.color ?? "white"].bg,
       }}
     >
-      {!!data.dueDate &&
-        !isCompleted &&
-        formatDDayString(new Date(), data.dueDate) && (
-          <span className="absolute -top-6 left-0 flex gap-1 bg-primary text-white rounded-md rounded-b-none text-xs font-bold p-1 pr-2 items-center">
-            <Timer className="size-4" />
-            {formatDDayString(new Date(), data.dueDate)}
-          </span>
-        )}
+      {!!data.dueDate && !isCompleted && DDayText && (
+        <span className="absolute -top-6 left-0 flex gap-1 bg-primary text-white rounded-md rounded-b-none text-xs font-bold p-1 pr-2 items-center">
+          <Timer className="size-4" />
+          {DDayText}
+        </span>
+      )}
       {!!data.parentTask && (
         <CardDescription className="flex items-end text-xs gap-0.5">
           {data.parentTask.content}

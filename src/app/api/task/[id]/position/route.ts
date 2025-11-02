@@ -1,3 +1,4 @@
+import dayjs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,7 +24,9 @@ export async function PATCH(
     });
 
     // KST 날짜가 같은 항목 찾기
-    const existing = taskPositions.find((tp) => tp.date === positionDate);
+    const existing = taskPositions.find((tp) =>
+      dayjs(tp.date).isSame(dayjs(positionDate), "day")
+    );
 
     let result;
     if (existing) {
@@ -39,7 +42,7 @@ export async function PATCH(
           taskId: id,
           positionX,
           positionY,
-          date: positionDate,
+          date: dayjs(positionDate).format(),
         },
       });
     }

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { deleteSprintApi, patchSprintApi } from "@/features/sprint/sprint-api";
 import { Sprint } from "@/features/sprint/types/sprint";
+import dayjs from "@/lib/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Pencil, Reply, Save, Trash2 } from "lucide-react";
@@ -72,18 +73,18 @@ function SprintItem({ sprint }: SprintItemProps) {
         <div className="flex gap-2">
           <CalendarSelect
             label="시작일"
-            date={form.startDate}
+            selectedDate={form.startDate ? dayjs(form.startDate) : null}
             onSelect={(newValue) => {
-              handleFormChange("startDate", newValue?.toISOString() ?? null);
+              handleFormChange("startDate", newValue?.format() ?? null);
             }}
             readonly={!editable}
             buttonProps={{ size: "sm", color: "secondary" }}
           />
           <CalendarSelect
             label="종료일"
-            date={form.endDate}
+            selectedDate={form.endDate ? dayjs(form.endDate) : null}
             onSelect={(newValue) => {
-              handleFormChange("endDate", newValue?.toISOString() ?? null);
+              handleFormChange("endDate", newValue?.format() ?? null);
             }}
             readonly={!editable}
             buttonProps={{ size: "sm", color: "secondary" }}

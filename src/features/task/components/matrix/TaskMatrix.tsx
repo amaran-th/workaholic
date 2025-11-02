@@ -14,6 +14,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import useMatrixFlow from "../../hooks/useMatrixFlow";
+import CustomControls from "./CustomControl";
 
 const nodeTypes = {
   task: TaskNode,
@@ -53,7 +54,9 @@ function TaskMatrix() {
       zoomOnDoubleClick={false}
       autoPanOnNodeDrag={false}
       fitView
-    />
+    >
+      <CustomControls />
+    </ReactFlow>
   );
 }
 

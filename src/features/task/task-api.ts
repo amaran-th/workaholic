@@ -6,6 +6,7 @@ import {
   PatchTaskRequest,
   PostTaskRequest,
   TaskFilter,
+  TaskListItem,
   TaskWithRelations,
 } from "./types/task";
 
@@ -39,7 +40,7 @@ export const useGetListTasksQuery = (
   params: TaskFilter,
   options?: { enabled?: boolean }
 ) =>
-  useQuery<(TaskWithRelations & { pinned: boolean })[], Error>({
+  useQuery<TaskListItem[], Error>({
     queryKey: ["list-tasks", params],
     queryFn: () => getListTasksApi(params),
     ...options,

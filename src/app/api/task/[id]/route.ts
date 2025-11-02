@@ -23,6 +23,18 @@ export async function PATCH(
     for (const field of allowedFields) {
       if (body[field] !== undefined) data[field] = body[field];
     }
+    const existing = await prisma.task.findUnique({
+      where: { id },
+      select: { categoryId: true },
+    });
+
+    if (!existing) {
+      return new NextResponse("Task not found", { status: 404 });
+    }
+
+    if ("categoryId" in data && data.categoryId !== existing.categoryId) {
+      data.sprintId = null;
+    }
 
     const updated = await prisma.task.update({
       where: { id },

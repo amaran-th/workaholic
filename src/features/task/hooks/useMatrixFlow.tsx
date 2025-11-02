@@ -6,6 +6,7 @@ import {
   useGetCenterPositionQuery,
 } from "@/features/member/member-api";
 import { MemberPosition } from "@/features/member/types/member";
+import { quadrantColorMap } from "@/lib/data";
 import {
   selectedDateAtom,
   taskFilterAtom,
@@ -13,7 +14,14 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Edge, Node } from "@xyflow/react";
 import { useAtom } from "jotai";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { patchTaskPositionApi, useGetMatrixTasksQuery } from "../task-api";
 import { EdgeType, NodeType } from "../types/task";
 
@@ -34,7 +42,7 @@ export default function useMatrixFlow(
       top: 0,
       bottom: 0,
     });
-
+  const frameRef = useRef<number | null>(null);
   const { data: centerPosition } = useGetCenterPositionQuery(
     { memberId: session!.user.id! },
     { enabled: !!session?.user?.id }
@@ -48,6 +56,7 @@ export default function useMatrixFlow(
   const { data: tasks } = useGetMatrixTasksQuery(taskFilter, {
     enabled: !!session?.user?.id,
   });
+  console.log(tasks);
 
   const [currentNodesFetching, setCurrentNodesFetching] =
     useState<boolean>(true);
@@ -98,7 +107,7 @@ export default function useMatrixFlow(
           y: localCenterPosition.top,
         },
         data: {
-          bgcolor: "#EF2D2D",
+          bgcolor: quadrantColorMap.FIRST,
           width: localCenterPosition.centerX - localCenterPosition.left,
           height: localCenterPosition.centerY - localCenterPosition.top,
         },
@@ -114,7 +123,7 @@ export default function useMatrixFlow(
           y: localCenterPosition.top,
         },
         data: {
-          bgcolor: "#FF9999",
+          bgcolor: quadrantColorMap.SECOND,
           width: localCenterPosition.right - localCenterPosition.centerX,
           height: localCenterPosition.centerY - localCenterPosition.top,
         },
@@ -130,7 +139,7 @@ export default function useMatrixFlow(
           y: localCenterPosition.centerY,
         },
         data: {
-          bgcolor: "#FF7F44",
+          bgcolor: quadrantColorMap.THIRD,
           width: localCenterPosition.centerX - localCenterPosition.left,
           height: localCenterPosition.bottom - localCenterPosition.centerY,
         },
@@ -146,7 +155,7 @@ export default function useMatrixFlow(
           y: localCenterPosition.centerY,
         },
         data: {
-          bgcolor: "#D9D9D9",
+          bgcolor: quadrantColorMap.FORTH,
           width: localCenterPosition.right - localCenterPosition.centerX,
           height: localCenterPosition.bottom - localCenterPosition.centerY,
         },
@@ -485,68 +494,61 @@ export default function useMatrixFlow(
     );
   }, [localCenterPosition, setNodes]);
 
-  const handleNodeDrag = (event: React.MouseEvent, node: Node) => {
-    if (!selectedDate) return;
-    if (node.id === "center") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        centerX: node.position.x,
-        centerY: node.position.y,
-      }));
-    }
-    if (node.id === "left") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        left: Math.min(node.position.x, prev.centerX),
-      }));
-    }
-    if (node.id === "right") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        right: Math.max(node.position.x, prev.centerX),
-      }));
-    }
-    if (node.id === "top") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        top: Math.min(node.position.y, prev.centerY),
-      }));
-    }
-    if (node.id === "bottom") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        bottom: Math.max(node.position.y, prev.centerY),
-      }));
-    }
-    if (node.id === "top-left") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        top: Math.min(node.position.y, prev.centerY),
-        left: Math.min(node.position.x, prev.centerX),
-      }));
-    }
-    if (node.id === "top-right") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        top: Math.min(node.position.y, prev.centerY),
-        right: Math.max(node.position.x, prev.centerX),
-      }));
-    }
-    if (node.id === "bottom-left") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        bottom: Math.max(node.position.y, prev.centerY),
-        left: Math.min(node.position.x, prev.centerX),
-      }));
-    }
-    if (node.id === "bottom-right") {
-      setLocalCenterPosition((prev) => ({
-        ...prev,
-        bottom: Math.max(node.position.y, prev.centerY),
-        right: Math.max(node.position.x, prev.centerX),
-      }));
-    }
-  };
+  const handleNodeDrag = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      if (!selectedDate) return;
+
+      // 기존에 예약된 프레임이 있다면 취소
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+
+      // 다음 프레임에 업데이트 예약
+      frameRef.current = requestAnimationFrame(() => {
+        setLocalCenterPosition((prev) => {
+          const next = { ...prev };
+
+          switch (node.id) {
+            case "center":
+              next.centerX = node.position.x;
+              next.centerY = node.position.y;
+              break;
+            case "left":
+              next.left = Math.min(node.position.x, prev.centerX);
+              break;
+            case "right":
+              next.right = Math.max(node.position.x, prev.centerX);
+              break;
+            case "top":
+              next.top = Math.min(node.position.y, prev.centerY);
+              break;
+            case "bottom":
+              next.bottom = Math.max(node.position.y, prev.centerY);
+              break;
+            case "top-left":
+              next.top = Math.min(node.position.y, prev.centerY);
+              next.left = Math.min(node.position.x, prev.centerX);
+              break;
+            case "top-right":
+              next.top = Math.min(node.position.y, prev.centerY);
+              next.right = Math.max(node.position.x, prev.centerX);
+              break;
+            case "bottom-left":
+              next.bottom = Math.max(node.position.y, prev.centerY);
+              next.left = Math.min(node.position.x, prev.centerX);
+              break;
+            case "bottom-right":
+              next.bottom = Math.max(node.position.y, prev.centerY);
+              next.right = Math.max(node.position.x, prev.centerX);
+              break;
+          }
+
+          return next;
+        });
+      });
+    },
+    [selectedDate, setLocalCenterPosition]
+  );
 
   const handleNodeDragStop = async (event: React.MouseEvent, node: Node) => {
     if (!selectedDate) return;
@@ -577,7 +579,7 @@ export default function useMatrixFlow(
         data: {
           positionX: node.position.x,
           positionY: node.position.y,
-          positionDate: selectedDate,
+          positionDate: selectedDate.format(),
         },
       });
     }

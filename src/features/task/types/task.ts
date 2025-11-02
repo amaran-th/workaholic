@@ -4,7 +4,7 @@ import { Sprint } from "@/features/sprint/types/sprint";
 export type DoStamp = {
   id: string;
   taskId: string;
-  createdAt: string; // ISO string
+  createdAt: string;
 };
 export enum TaskStatus {
   TODO = "TODO",
@@ -14,9 +14,9 @@ export enum TaskStatus {
   ICE = "ICE",
 }
 export enum DayTaskStatus {
-  TODO,
-  DOINT,
-  COMPLTED,
+  TODO = "TODO",
+  DOING = "DOING",
+  COMPLETED = "COMPLETED",
 }
 
 export type TaskWithRelations = {
@@ -30,11 +30,16 @@ export type TaskWithRelations = {
   comment: string | null;
   positionX: number;
   positionY: number;
-  category: Category;
+  category: Category | null;
   memberId: string;
   parentTask: { id: string; content: string } | null;
   sprint: Sprint | null;
   doStamps: DoStamp[];
+};
+
+export type TaskListItem = TaskWithRelations & {
+  pinned: boolean;
+  priority: number | null;
 };
 
 export interface CreateTaskInput {
@@ -64,7 +69,7 @@ export type PostTaskRequest = {
 export type PatchTaskRequest = Partial<{
   content: string;
   memo: string;
-  dueDate: Date | null;
+  dueDate: string | null;
   categoryId: string | null;
   parentTaskId: string | null;
   sprintId: string | null;

@@ -28,23 +28,42 @@ function SelectTrigger({
   className,
   size = "default",
   children,
+  cell,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
+  cell?: boolean;
 }) {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group flex items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap transition-all outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        "focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[size=default]:h-9 data-[size=sm]:h-8",
+        cell && [
+          "pl-0 border-transparent shadow-none bg-transparent text-foreground",
+          "focus-within:pl-3 focus-within:border-border focus-within:shadow-sm focus-within:bg-background",
+          "data-[state=open]:pl-3 data-[state=open]:border-border data-[state=open]:shadow-sm data-[state=open]:bg-background",
+          "transition-all duration-200",
+        ],
+
         className
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
+        <ChevronDownIcon
+          className={cn(
+            "size-4 text-muted-foreground transition-opacity duration-200",
+            cell
+              ? "opacity-0 group-data-[state=open]:opacity-50 group-focus-within:opacity-50"
+              : "opacity-50"
+          )}
+        />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );

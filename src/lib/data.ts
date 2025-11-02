@@ -20,4 +20,13 @@ export const colorMap: Record<
   brown: { bg: "#EBE6D4", primary: "#A87B00", sub: "#E4CCB1" },
 };
 
+export const quadrantColorMap: Record<
+  "FIRST" | "SECOND" | "THIRD" | "FORTH",
+  string
+> = {
+  FIRST: "#EF2D2D",
+  SECOND: "#FF9999",
+  THIRD: "#FF7F44",
+  FORTH: "#D9D9D9",
+};
 export const HEADER_HEIGHT = 48;
