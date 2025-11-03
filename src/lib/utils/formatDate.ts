@@ -7,10 +7,17 @@ export const formatDDayString = (
 ): string | null => {
   if (!criteria || !targetDate) return "";
 
-  const target = dayjs.tz(targetDate, "Asia/Seoul");
+  const target = dayjs(targetDate);
 
   const diffDays = target.startOf("day").diff(criteria.startOf("day"), "day");
   const diffHours = target.diff(criteria, "hour");
+  console.log(
+    criteria,
+    targetDate,
+    target,
+    target.startOf("day"),
+    criteria.startOf("day")
+  );
 
   if (diffDays > 0) return `D-${diffDays}`;
   if (diffDays === 0) return `${diffHours}시간`;
@@ -25,7 +32,7 @@ export const convertKSTDateToUTC = (dateStr: string) => {
   const startOfKSTDay = kstDate.startOf("day");
   const endOfKSTDay = kstDate.endOf("day");
 
-  const startUTC = startOfKSTDay.utc().format(); // 2025-11-02T15:00:00Z
+  const startUTC = startOfKSTDay.utc().format();
   const endUTC = endOfKSTDay.utc().format();
   return {
     startUTC,

@@ -318,7 +318,7 @@ function DateTimePicker({
     (value ?? dayjs()).format("YYYY-MM-DD")
   );
   const [time, setTime] = React.useState<string>(
-    value?.format("HH:mm:ss") ?? "00:00:00"
+    value ? value.format("HH:mm:ss") : "00:00:00"
   );
 
   return (
@@ -352,7 +352,8 @@ function DateTimePicker({
         )}
         <Button
           onClick={() => {
-            onSubmit(dayjs(`${date}T${time}`).format());
+            console.log(date, time);
+            onSubmit(dayjs(`${date}T${time ?? "00:00:00"}`).format());
           }}
           disabled={!date || !time}
         >

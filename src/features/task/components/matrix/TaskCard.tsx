@@ -1,6 +1,7 @@
 import { CategoryBadge } from "@/components/ui/badge";
 import { Card, CardDescription } from "@/components/ui/card";
 import { colorMap } from "@/lib/data";
+import dayjs from "@/lib/dayjs";
 import {
   selectedDateAtom,
   taskFilterAtom,
@@ -58,7 +59,11 @@ function TaskCard({
   }, [isCompleted, isDoing]);
 
   const DDayText = useMemo(
-    () => formatDDayString(selectedDate, data.dueDate),
+    () =>
+      formatDDayString(
+        dayjs().isSame(selectedDate, "day") ? dayjs() : selectedDate,
+        data.dueDate
+      ),
     [data.dueDate, selectedDate]
   );
 

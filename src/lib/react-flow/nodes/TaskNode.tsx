@@ -313,7 +313,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <DateTimePicker
-              value={dayjs(dueDate)}
+              value={dueDate ? dayjs(dueDate) : null}
               onClear={() => {
                 patchTask.mutate({
                   taskId: data.id,
