@@ -21,7 +21,15 @@ import {
 
 function QuadrantNode({
   data,
-}: NodeProps & { data: { bgcolor: string; width: number; height: number } }) {
+}: NodeProps & {
+  data: {
+    bgcolor: string;
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+  };
+}) {
   const { getViewport } = useReactFlow();
   const [contextPos, setContextPos] = useState<{
     positionX: number;
@@ -75,8 +83,8 @@ function QuadrantNode({
           <div
             style={{
               backgroundColor: data.bgcolor,
-              width: data.width,
-              height: data.height,
+              width: data.right - data.left,
+              height: data.bottom - data.top,
             }}
           />
         </ContextMenuTrigger>

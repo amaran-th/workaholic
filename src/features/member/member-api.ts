@@ -48,13 +48,14 @@ export async function patchPositionApi({
   centerY,
 }: {
   memberId: string;
+} & Partial<{
   left: number;
   right: number;
   top: number;
   bottom: number;
   centerX: number;
   centerY: number;
-}) {
+}>) {
   const res = await fetch(`${API_BASE}/${memberId}/position`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
