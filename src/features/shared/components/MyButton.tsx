@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { LogOut } from "lucide-react";
+import { CircleUser, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { logoutMemberApi } from "../../auth/auth-api";
 import { sessionAtom } from "../../auth/store/sessionAtom";
@@ -36,7 +35,7 @@ export default function MyButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button asChild>MY</Button>
+        <CircleUser size={32} strokeWidth={1} />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => router.push("/my")}>
