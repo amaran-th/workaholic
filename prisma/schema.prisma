@@ -8,91 +8,84 @@ datasource db {
 }
 
 model Member {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String?
-  name      String?
-  centerX   Float    @default(0)
-  centerY   Float    @default(0)
-  left      Float    @default(0)
-  right     Float    @default(0)
-  top       Float    @default(0)
-  bottom    Float    @default(0)
-  bio       String?
-  avatarUrl String?
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
+  id         String     @id @default(cuid())
+  email      String     @unique
+  password   String?
+  name       String?
+  centerX    Float      @default(0)
+  centerY    Float      @default(0)
+  bio        String?
+  avatarUrl  String?
+  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
+  bottom     Float      @default(0)
+  left       Float      @default(0)
+  right      Float      @default(0)
+  top        Float      @default(0)
   categories Category[]
-  tasks      Task[]
   sprints    Sprint[]
+  tasks      Task[]
 }
 
 model Category {
-  id         String    @id @default(uuid())
-  name       String
-  color      String
-  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
-
-  member     Member    @relation(fields: [memberId], references: [id])
-  memberId   String
-  tasks      Task[]
-  sprints    Sprint[]
+  id        String   @id @default(uuid())
+  color     String
+  memberId  String
+  name      String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  member    Member   @relation(fields: [memberId], references: [id])
+  sprints   Sprint[]
+  tasks     Task[]
 }
 
 model Task {
-  id            String     @id @default(uuid())
+  id            String         @id @default(uuid())
   no            Int
   content       String
   memo          String?
-  startDate     DateTime?  @db.Timestamptz(6)
-  endDate       DateTime?  @db.Timestamptz(6)
-  dueDate       DateTime?  @db.Timestamptz(6)
+  startDate     DateTime?      @db.Timestamptz(6)
+  endDate       DateTime?      @db.Timestamptz(6)
+  dueDate       DateTime?      @db.Timestamptz(6)
   comment       String?
-  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
-
-  category      Category?  @relation(fields: [categoryId], references: [id])
   categoryId    String?
-
-  member        Member     @relation(fields: [memberId], references: [id])
   memberId      String
-
-  parentTask    Task?      @relation("SubTasks", fields: [parentTaskId], references: [id])
   parentTaskId  String?
-  subTasks      Task[]     @relation("SubTasks")
-
-  doStamps      DoStamp[]
-  taskPositions TaskPosition[]
-  sprint        Sprint?    @relation(fields: [sprintId], references: [id])
   sprintId      String?
+  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
+  doStamps      DoStamp[]
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  member        Member         @relation(fields: [memberId], references: [id])
+  parentTask    Task?          @relation("SubTasks", fields: [parentTaskId], references: [id])
+  subTasks      Task[]         @relation("SubTasks")
+  sprint        Sprint?        @relation(fields: [sprintId], references: [id])
+  taskPositions TaskPosition[]
 }
 
 model DoStamp {
   id        String   @id @default(uuid())
-  task      Task     @relation(fields: [taskId], references: [id])
   taskId    String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
+  task      Task     @relation(fields: [taskId], references: [id])
 }
 
 model TaskPosition {
-  id          String   @id @default(uuid())
-  positionX   Float
-  positionY   Float
-  task        Task     @relation(fields: [taskId], references: [id])
-  taskId      String
-  date        String
+  id        String @id @default(uuid())
+  positionX Float
+  positionY Float
+  taskId    String
+  date      String
+  task      Task   @relation(fields: [taskId], references: [id])
 }
 
 model Sprint {
-  id         String     @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
-  startDate  DateTime?  @db.Timestamptz(6)
-  endDate    DateTime?  @db.Timestamptz(6)
-  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+  startDate  DateTime? @db.Timestamptz(6)
+  endDate    DateTime? @db.Timestamptz(6)
   memberId   String
   categoryId String
-
-  member     Member     @relation(fields: [memberId], references: [id])
-  category   Category   @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
+  category   Category  @relation(fields: [categoryId], references: [id])
+  member     Member    @relation(fields: [memberId], references: [id])
   tasks      Task[]
 }
