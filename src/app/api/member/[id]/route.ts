@@ -26,10 +26,10 @@ export async function GET(
 // PATCH /api/member/:id
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
 
     // 업데이트 가능한 필드만 필터링

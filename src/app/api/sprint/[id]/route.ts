@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 // ✅ 단일 스프린트 조회
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const sprint = await prisma.sprint.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { category: true, tasks: true },
     });
 
@@ -24,14 +25,15 @@ export async function GET(
 // ✅ 스프린트 수정
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const body = await req.json();
     const { name, startDate, endDate, categoryId } = body;
 
     const updated = await prisma.sprint.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(startDate && { startDate: new Date(startDate) }),
@@ -50,10 +52,11 @@ export async function PATCH(
 // ✅ 스프린트 삭제
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    await prisma.sprint.delete({ where: { id: params.id } });
+    const { id } = await context.params;
+    await prisma.sprint.delete({ where: { id } });
     return new NextResponse("Sprint deleted", { status: 200 });
   } catch (error) {
     console.error(error);

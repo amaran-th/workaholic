@@ -28,9 +28,9 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const memberId = params.id;
+  const { id: memberId } = await context.params;
   const { centerX, centerY, left, right, top, bottom } =
     (await req.json()) as MemberPosition;
 

@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
 
     const allowedFields = [
@@ -49,10 +49,10 @@ export async function PATCH(
 }
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     // 트랜잭션으로 task와 연관된 doStamp를 모두 삭제
     await prisma.$transaction([
