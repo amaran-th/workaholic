@@ -10,9 +10,7 @@ export default function SessionInitializer() {
   const { data, isLoading } = useGetSessionQuery();
 
   useEffect(() => {
-    console.log("🔥 SessionInitializer mounted", isLoading);
     if (!isLoading) {
-      console.log(data);
       setSession(data ?? null);
     }
   }, [data, isLoading, setSession]);

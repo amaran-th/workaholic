@@ -348,7 +348,6 @@ function DateTimePicker({
         )}
         <Button
           onClick={() => {
-            console.log(date, time);
             onSubmit(dayjs(`${date}T${time ?? "00:00:00"}`).format());
           }}
           disabled={!date || !time}

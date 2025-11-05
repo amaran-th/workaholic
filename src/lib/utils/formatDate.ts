@@ -12,13 +12,6 @@ export const formatDDayString = (
   const diffDays = target.startOf("day").diff(criteria.startOf("day"), "day");
   const diffHours = target.diff(criteria, "hour");
   const diffMinutes = target.diff(criteria, "minute");
-  console.log(
-    criteria,
-    targetDate,
-    target,
-    target.startOf("day"),
-    criteria.startOf("day")
-  );
 
   if (diffDays > 0) return `D-${diffDays}`;
   if (diffDays === 0) {

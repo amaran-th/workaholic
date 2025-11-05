@@ -15,7 +15,6 @@ export async function POST(
 
     const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (!task) throw new Error("Task not found");
-    console.log("test", date, startUTC, endUTC);
     // 특정 날짜의 doStamp 확인
     const sameDayStamp = await prisma.doStamp.findFirst({
       where: {
