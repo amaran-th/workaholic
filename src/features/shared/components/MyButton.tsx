@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { CircleUser, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import { logoutMemberApi } from "../../auth/auth-api";
 import { sessionAtom } from "../../auth/store/sessionAtom";
 
 export default function MyButton() {
+  const queryClient = useQueryClient();
   const [, setSession] = useAtom(sessionAtom);
   const router = useRouter();
 
@@ -21,6 +22,7 @@ export default function MyButton() {
     mutationFn: logoutMemberApi,
     onSuccess: () => {
       setSession(null);
+      queryClient.invalidateQueries({ queryKey: ["session"] });
       router.push("/login");
     },
   });

@@ -1,21 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { CalendarSelect } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { deleteSprintApi, patchSprintApi } from "@/features/sprint/sprint-api";
 import { Sprint } from "@/features/sprint/types/sprint";
 import dayjs from "@/lib/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAtom } from "jotai";
 import { Pencil, Reply, Save, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SprintItemProps {
   sprint: Sprint;
 }
 function SprintItem({ sprint }: SprintItemProps) {
   const queryClient = useQueryClient();
-  const [session] = useAtom(sessionAtom);
   const [editable, setEditable] = useState<boolean>(false);
   const [form, setForm] = useState<{
     name: string;
@@ -27,14 +24,12 @@ function SprintItem({ sprint }: SprintItemProps) {
     endDate: sprint.endDate,
   });
 
-  const memberId = useMemo(() => session?.user.id, [session]);
-
   const patchSprint = useMutation({
     mutationFn: patchSprintApi,
     onSuccess: () => {
       setEditable(false);
       queryClient.invalidateQueries({
-        queryKey: ["sprints", { memberId, categoryId: sprint.categoryId }],
+        queryKey: ["sprints", { categoryId: sprint.categoryId }],
       });
     },
   });
@@ -43,7 +38,7 @@ function SprintItem({ sprint }: SprintItemProps) {
     mutationFn: deleteSprintApi,
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ["sprints", { memberId, categoryId: sprint.categoryId }],
+        queryKey: ["sprints", { categoryId: sprint.categoryId }],
       }),
   });
 

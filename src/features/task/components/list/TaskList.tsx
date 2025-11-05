@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { useGetCategoriesQuery } from "@/features/category/category-api";
 import { Color, colorMap } from "@/lib/data";
 import {
@@ -27,18 +26,13 @@ import { useGetListTasksQuery } from "../../task-api";
 import TaskListRow from "./TaskListRow";
 
 function TaskList() {
-  const [session] = useAtom(sessionAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [selectedCategoryId, setSelectedCategoryId] = useAtom(
     selectedCategoryIdAtom
   );
   const [taskFilter] = useAtom(taskFilterAtom);
-  const { data: categories } = useGetCategoriesQuery({
-    memberId: session?.user.id ?? "",
-  });
-  const { data: tasks, isFetching } = useGetListTasksQuery(taskFilter, {
-    enabled: !!session?.user?.id,
-  });
+  const { data: categories } = useGetCategoriesQuery();
+  const { data: tasks, isFetching } = useGetListTasksQuery(taskFilter);
 
   // const getTaskStatus = useCallback(
   //   (startDate: string | null, endDate: string | null) => {

@@ -1,9 +1,12 @@
 import dayjs from "@/lib/dayjs";
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
+    const { id: memberId } = await authenticate(req);
+
     const body = await req.json();
     const {
       content,
@@ -11,7 +14,6 @@ export async function POST(req: NextRequest) {
       positionX,
       positionY,
       dueDate,
-      memberId,
       categoryId,
       parentTaskId,
       sprintId,

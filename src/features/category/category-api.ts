@@ -3,21 +3,18 @@ import { Category, PostCategoryRequest } from "./types/category";
 
 const API_BASE = "/api/category";
 
-export async function getCategoriesApi(params: {
-  memberId?: string;
-}): Promise<Category[]> {
-  const res = await fetch(`${API_BASE}?memberId=${params.memberId}`);
+export async function getCategoriesApi(): Promise<Category[]> {
+  const res = await fetch(`${API_BASE}`);
   if (!res.ok) {
     throw new Error("카테고리 목록을 불러오지 못했습니다.");
   }
   return res.json();
 }
 
-export function useGetCategoriesQuery(params: { memberId?: string }) {
+export function useGetCategoriesQuery() {
   return useQuery<Category[]>({
-    queryKey: ["categories", params],
-    queryFn: () => getCategoriesApi(params),
-    enabled: !!params.memberId,
+    queryKey: ["categories"],
+    queryFn: () => getCategoriesApi(),
   });
 }
 

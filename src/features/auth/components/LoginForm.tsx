@@ -4,19 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils/utils";
-import { useAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { loginMemberApi } from "../auth-api";
-import { sessionAtom } from "../store/sessionAtom";
 
 export default function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [, setSession] = useAtom(sessionAtom);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -24,7 +23,9 @@ export default function LoginForm({
 
     try {
       const { session } = await loginMemberApi({ email, password });
-      setSession(session);
+      queryClient.invalidateQueries({ queryKey: ["session"] });
+      // supabase.auth.setSession(session);
+      // setSession(session);
       router.push("/");
     } catch (err) {
       if (err instanceof Error) alert(err.message);

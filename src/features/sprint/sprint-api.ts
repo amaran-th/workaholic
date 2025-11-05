@@ -6,24 +6,18 @@ import { PostSprintRequest, Sprint } from "./types/sprint";
 const API_BASE = "/api/sprint";
 
 const getSprintApi = async (params: {
-  memberId?: string;
   categoryId?: string | null;
 }): Promise<Sprint[]> => {
-  const res = await fetch(
-    `${API_BASE}?memberId=${params.memberId}&categoryId=${params.categoryId}`
-  );
+  const res = await fetch(`${API_BASE}?categoryId=${params.categoryId}`);
   if (!res.ok) throw new Error("스프린트 목록 불러오기 실패");
   return res.json();
 };
 
-export const useGetSprintQuery = (params: {
-  memberId?: string;
-  categoryId?: string | null;
-}) =>
+export const useGetSprintQuery = (params: { categoryId?: string | null }) =>
   useQuery<Sprint[], Error>({
     queryKey: ["sprints", params],
     queryFn: () => getSprintApi(params),
-    enabled: !!params.categoryId && !!params.memberId,
+    enabled: !!params.categoryId,
   });
 
 export async function postSprintApi(data: PostSprintRequest): Promise<Sprint> {

@@ -1,6 +1,5 @@
 "use client";
 
-import { withProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import TaskList from "@/features/task/components/list/TaskList";
 
 function ListPage() {
@@ -11,6 +10,6 @@ function ListPage() {
   );
 }
 
-export default withProtectedRoute(ListPage);
+export default ListPage;
 
 // 새 task 생성 -> 기본적으로 pin 상태(매트릭스 범위 내에 있음, 매트릭스 범위 바깥에 있을 경우 보이지 않음)

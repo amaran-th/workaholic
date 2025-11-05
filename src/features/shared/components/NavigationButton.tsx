@@ -12,7 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 const viewModes = [
   { path: "/", label: "아이젠하우어 매트릭스" },
   { path: "/list", label: "목록" },
-  // { path: "/calendar", label: "캘린더" },
+  //{ path: "/calendar", label: "캘린더" },
 ];
 
 export default function NavigationButton() {
@@ -30,7 +30,7 @@ export default function NavigationButton() {
           : undefined
       }
     >
-      <SelectTrigger>
+      <SelectTrigger className="w-[190px]">
         <SelectValue placeholder="뷰 모드 선택" />
       </SelectTrigger>
       <SelectContent>

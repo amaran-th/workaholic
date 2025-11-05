@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { useGetCategoriesQuery } from "@/features/category/category-api";
 import { Color, colorMap } from "@/lib/data";
 import { cn } from "@/lib/utils/utils";
@@ -57,15 +56,11 @@ import {
 
 function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
   const queryClient = useQueryClient();
-  const [session] = useAtom(sessionAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
 
-  const { data: categories } = useGetCategoriesQuery({
-    memberId: session?.user.id ?? "",
-  });
+  const { data: categories } = useGetCategoriesQuery();
 
   const { data: sprints } = useGetSprintQuery({
-    memberId: session?.user.id ?? "",
     categoryId: task.category?.id,
   });
 

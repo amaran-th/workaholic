@@ -1,6 +1,5 @@
 "use client";
 
-import { withProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import MyCategory from "@/features/member/components/MyCategory";
 import MyProfile from "@/features/member/components/MyProfile";
 
@@ -13,4 +12,4 @@ function MyPage() {
   );
 }
 
-export default withProtectedRoute(MyPage);
+export default MyPage;

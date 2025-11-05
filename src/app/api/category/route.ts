@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/categories?memberId=xxx
+// GET /api/categories?=xxx
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const memberId = searchParams.get("memberId");
+    const { id: memberId } = await authenticate(req);
 
     if (!memberId) {
       return NextResponse.json(
@@ -33,8 +33,9 @@ export async function GET(req: NextRequest) {
 // POST /api/categories
 export async function POST(req: NextRequest) {
   try {
+    const { id: memberId } = await authenticate(req);
     const body = await req.json();
-    const { memberId, name, color } = body;
+    const { name, color } = body;
 
     if (!memberId || !name || !color) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });

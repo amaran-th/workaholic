@@ -1,6 +1,25 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { MemberSession } from "./types/auth";
+
 const API_BASE = "/api/auth";
+
+const getSessionApi = async () => {
+  const res = await fetch(`${API_BASE}/session`);
+  if (!res.ok) throw new Error("세션 불러오기 실패");
+  return res.json();
+};
+
+export const useGetSessionQuery = () =>
+  useQuery<MemberSession, Error>({
+    queryKey: ["session"],
+    queryFn: () => getSessionApi(),
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
 
 export const loginMemberApi = async (params: {
   email: string;
