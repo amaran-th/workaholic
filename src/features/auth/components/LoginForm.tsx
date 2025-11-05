@@ -24,9 +24,8 @@ export default function LoginForm({
     try {
       const { session } = await loginMemberApi({ email, password });
       queryClient.invalidateQueries({ queryKey: ["session"] });
-      // supabase.auth.setSession(session);
-      // setSession(session);
       router.push("/");
+      router.refresh();
     } catch (err) {
       if (err instanceof Error) alert(err.message);
     }

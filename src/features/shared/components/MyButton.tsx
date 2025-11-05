@@ -24,6 +24,7 @@ export default function MyButton() {
       setSession(null);
       queryClient.invalidateQueries({ queryKey: ["session"] });
       router.push("/login");
+      router.refresh();
     },
   });
 
