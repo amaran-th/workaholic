@@ -17,7 +17,10 @@ export async function PATCH(
       "categoryId",
       "parentTaskId",
       "sprintId",
+      "createdAt",
     ];
+
+    // TODO createdAt이 startDate보다 뒤에 오면 안됨
     const data: Record<string, any> = {};
 
     for (const field of allowedFields) {

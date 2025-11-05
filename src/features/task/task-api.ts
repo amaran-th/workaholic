@@ -72,6 +72,22 @@ export const patchTaskApi = async ({
   return res.json();
 };
 
+export const patchTaskStartDateApi = async ({
+  taskId,
+  data,
+}: {
+  taskId: string;
+  data: { date: string | null; selectedDate: string };
+}) => {
+  const res = await fetch(`${API_BASE}/${taskId}/start`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Task 시작일 수정 실패");
+  return res.json();
+};
+
 export const patchTaskPositionApi = async ({
   taskId,
   data,

@@ -34,7 +34,7 @@ const CustomControls = () => {
       >
         <div className="p-2 flex flex-col gap-1">
           <CalendarSelect
-            selectedDate={selectedDate ?? null}
+            selected={selectedDate ?? null}
             onSelect={(newValue) => {
               if (!newValue) return;
               setSelectedDate(newValue);

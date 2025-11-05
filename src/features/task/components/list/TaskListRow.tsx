@@ -32,6 +32,7 @@ import { useCallback, useMemo, useState } from "react";
 import {
   deleteTaskApi,
   patchTaskApi,
+  patchTaskStartDateApi,
   toggleCompleteStamp,
   toggleDoingStamp,
 } from "../../task-api";
@@ -65,6 +66,15 @@ function TaskListRow({ task }: { task: TaskListItem }) {
       taskId: string;
       data: PatchTaskRequest;
     }) => patchTaskApi({ taskId, data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+  });
+
+  const patchTaskStartDate = useMutation({
+    mutationFn: patchTaskStartDateApi,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["list-tasks", taskFilter],
@@ -317,14 +327,55 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         </Select>
       </TableCell>
       <TableCell>
-        {task.startDate ? dayjs(task.startDate).format("YYYY-MM-DD") : "-"}
+        <CalendarSelect
+          selected={task.createdAt ? dayjs(task.createdAt) : null}
+          placeholder="-"
+          onSelect={(newValue) => {
+            patchTask.mutate({
+              taskId: task.id,
+              data: { createdAt: newValue?.format() },
+            });
+          }}
+          {...(task.startDate
+            ? { disabled: { after: new Date(task.startDate) } }
+            : {})}
+          cell
+        />
+      </TableCell>
+      <TableCell>
+        <CalendarSelect
+          selected={task.startDate ? dayjs(task.startDate) : null}
+          placeholder="-"
+          onSelect={(newValue) => {
+            if (!selectedDate) return;
+            if (
+              confirm(
+                newValue
+                  ? "시작일을 변경하면 변경되는 날짜 이전의 작업 기록이 모두 사라집니다.\n 정말로 변경하시겠습니까?"
+                  : "시작일을 초기화하면 종료일을 포함한 해당 업무의 모든 작업 기록이 삭제됩니다.\n정말로 삭제하시겠습니까?"
+              )
+            ) {
+              patchTaskStartDate.mutate({
+                taskId: task.id,
+                data: {
+                  date: newValue?.format() ?? null,
+                  selectedDate: selectedDate.format(),
+                },
+              });
+            }
+          }}
+          {...(task.endDate
+            ? { disabled: { after: new Date(task.endDate) } }
+            : {})}
+          cell
+        />
       </TableCell>
       <TableCell>
         {task.endDate ? dayjs(task.endDate).format("YYYY-MM-DD") : "-"}
       </TableCell>
       <TableCell>
         <CalendarSelect
-          selectedDate={task.dueDate ? dayjs(task.dueDate) : null}
+          selected={task.dueDate ? dayjs(task.dueDate) : null}
           placeholder="-"
           onSelect={(newValue) => {
             patchTask.mutate({

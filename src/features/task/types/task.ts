@@ -35,6 +35,7 @@ export type TaskWithRelations = {
   parentTask: { id: string; content: string } | null;
   sprint: Sprint | null;
   doStamps: DoStamp[];
+  createdAt: string;
 };
 
 export type TaskListItem = TaskWithRelations & {
@@ -75,6 +76,7 @@ export type PatchTaskRequest = Partial<{
   parentTaskId: string | null;
   sprintId: string | null;
   comment: string | null;
+  createdAt: string;
 }>;
 
 export type TaskFilter = {

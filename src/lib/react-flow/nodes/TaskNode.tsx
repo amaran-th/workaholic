@@ -40,6 +40,7 @@ import TaskCard from "@/features/task/components/matrix/TaskCard";
 import {
   deleteTaskApi,
   patchTaskApi,
+  patchTaskStartDateApi,
   toggleCompleteStamp,
   toggleDoingStamp,
 } from "@/features/task/task-api";
@@ -168,6 +169,8 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const queryClient = useQueryClient();
   const [memo, setMemo] = useState<string>(data.memo ?? "");
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
+  const [planDate, setPlanDate] = useState<string | null>(data.createdAt);
+  const [startDate, setStartDate] = useState<string | null>(data.startDate);
 
   const patchTask = useMutation({
     mutationFn: ({
@@ -177,6 +180,15 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
       taskId: string;
       data: PatchTaskRequest;
     }) => patchTaskApi({ taskId, data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["matrix-tasks", taskFilter],
+      });
+    },
+  });
+
+  const patchTaskStartDate = useMutation({
+    mutationFn: patchTaskStartDateApi,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["matrix-tasks", taskFilter],
@@ -291,6 +303,93 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </Button>
         </ContextMenuItem>
         <ContextMenuSeparator />
+        <ContextMenuSub
+          onOpenChange={(open) => {
+            if (open) {
+              setPlanDate(data.createdAt);
+            }
+          }}
+        >
+          <ContextMenuSubTrigger className="items-start">
+            <CalendarClock />
+            <div>
+              <p>계획일</p>
+              {data.createdAt ? ( // TODO 계획일/시작일 선택 시 최대 날짜 설정
+                <p className="text-xs text-sub-text">
+                  {dayjs(data.createdAt)?.format("YYYY-MM-DD HH:mm")}
+                </p>
+              ) : (
+                <p className="text-xs text-placeholder">YYYY-MM-DD HH:mm</p>
+              )}
+            </div>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <DateTimePicker
+              value={planDate ? dayjs(planDate) : null}
+              onSubmit={(newValue: string) => {
+                patchTask.mutate({
+                  taskId: data.id,
+                  data: { createdAt: newValue },
+                });
+              }}
+            />
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub
+          onOpenChange={(open) => {
+            if (open) {
+              setStartDate(data.startDate);
+            }
+          }}
+        >
+          <ContextMenuSubTrigger className="items-start">
+            <CalendarClock />
+            <div>
+              <p>시작일</p>
+              {data.startDate ? (
+                <p className="text-xs text-sub-text">
+                  {dayjs(data.startDate)?.format("YYYY-MM-DD HH:mm")}
+                </p>
+              ) : (
+                <p className="text-xs text-placeholder">YYYY-MM-DD HH:mm</p>
+              )}
+            </div>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <DateTimePicker
+              value={startDate ? dayjs(startDate) : null}
+              onClear={() => {
+                if (!selectedDate) return;
+                if (
+                  confirm(
+                    "시작일을 초기화하면 종료일을 포함한 해당 업무의 모든 작업 기록이 삭제됩니다.\n정말로 삭제하시겠습니까?"
+                  )
+                ) {
+                  patchTaskStartDate.mutate({
+                    taskId: data.id,
+                    data: { date: null, selectedDate: selectedDate.format() },
+                  });
+                }
+              }}
+              onSubmit={(newValue: string) => {
+                if (!selectedDate) return;
+                if (
+                  confirm(
+                    "시작일을 변경하면 변경되는 날짜 이전의 작업 기록이 모두 사라집니다.\n 정말로 변경하시겠습니까?"
+                  )
+                ) {
+                  patchTaskStartDate.mutate({
+                    taskId: data.id,
+                    data: {
+                      date: newValue,
+                      selectedDate: selectedDate.format(),
+                    },
+                  });
+                }
+              }}
+            />
+          </ContextMenuSubContent>
+        </ContextMenuSub>
         <ContextMenuSub
           onOpenChange={(open) => {
             if (open) {

@@ -73,7 +73,7 @@ function SprintItem({ sprint }: SprintItemProps) {
         <div className="flex gap-2">
           <CalendarSelect
             label="시작일"
-            selectedDate={form.startDate ? dayjs(form.startDate) : null}
+            selected={form.startDate ? dayjs(form.startDate) : null}
             onSelect={(newValue) => {
               handleFormChange("startDate", newValue?.format() ?? null);
             }}
@@ -82,7 +82,7 @@ function SprintItem({ sprint }: SprintItemProps) {
           />
           <CalendarSelect
             label="종료일"
-            selectedDate={form.endDate ? dayjs(form.endDate) : null}
+            selected={form.endDate ? dayjs(form.endDate) : null}
             onSelect={(newValue) => {
               handleFormChange("endDate", newValue?.format() ?? null);
             }}

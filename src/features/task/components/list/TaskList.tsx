@@ -57,7 +57,7 @@ function TaskList() {
       <div className="flex gap-2 justify-between">
         <h2 className="text-2xl font-bold">오늘의 업무</h2>
         <CalendarSelect
-          selectedDate={selectedDate ?? null}
+          selected={selectedDate ?? null}
           onSelect={(newValue) => {
             if (!newValue) return;
             setSelectedDate(newValue);
@@ -113,6 +113,7 @@ function TaskList() {
               <TableHead>상태</TableHead>
               <TableHead className="min-w-[180px]">카테고리</TableHead>
               <TableHead className="min-w-[240px]">스프린트</TableHead>
+              <TableHead className="min-w-[160px]">계획일</TableHead>
               <TableHead className="min-w-[160px]">시작일</TableHead>
               <TableHead className="min-w-[160px]">종료일</TableHead>
               <TableHead className="min-w-[160px]">마감 기한</TableHead>

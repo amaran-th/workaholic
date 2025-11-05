@@ -221,11 +221,32 @@ function CalendarDayButton({
   );
 }
 
+function SingleCalendar({
+  selected,
+  onSelect,
+  ...props
+}: React.ComponentProps<typeof Calendar> & {
+  selected: Dayjs | null;
+  onSelect: (value: Dayjs | null) => void;
+}) {
+  return (
+    <Calendar
+      {...props}
+      mode="single"
+      selected={selected ? selected.toDate() : undefined}
+      onSelect={(newValue) => {
+        if (!newValue) return;
+        onSelect(dayjs(newValue));
+      }}
+    />
+  );
+}
+
 interface CalendarSelectProps {
   label?: string;
   placeholder?: string;
   readonly?: boolean;
-  selectedDate: Dayjs | null; // "YYYY-MM-DD" 또는 ISO 문자열
+  selected: Dayjs | null; // "YYYY-MM-DD" 또는 ISO 문자열
   onSelect: (newValue: Dayjs | null) => void;
   cell?: boolean;
   buttonProps?: VariantProps<typeof buttonVariants>;
@@ -235,11 +256,10 @@ function CalendarSelect({
   label,
   placeholder,
   readonly,
-  selectedDate,
-  onSelect,
   cell,
   buttonProps,
-}: CalendarSelectProps) {
+  ...props
+}: React.ComponentProps<typeof SingleCalendar> & CalendarSelectProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -252,7 +272,7 @@ function CalendarSelect({
 
       {readonly ? (
         <p className="text-xs text-secondary leading-8">
-          {selectedDate ? selectedDate.format("YYYY-MM-DD") : "미정"}
+          {props.selected ? props.selected.format("YYYY-MM-DD") : "미정"}
         </p>
       ) : (
         <Popover open={open} onOpenChange={setOpen}>
@@ -266,42 +286,18 @@ function CalendarSelect({
               {...buttonProps}
               color={buttonProps?.color ?? undefined}
             >
-              {selectedDate
-                ? selectedDate.format("YYYY-MM-DD")
+              {props.selected
+                ? props.selected.format("YYYY-MM-DD")
                 : placeholder ?? "날짜 선택"}
               {(!cell || open) && <ChevronDownIcon />}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-            <SingleCalendar
-              selected={selectedDate}
-              onSelect={(newDate) => {
-                onSelect(newDate);
-              }}
-            />
+            <SingleCalendar {...props} />
           </PopoverContent>
         </Popover>
       )}
     </div>
-  );
-}
-
-function SingleCalendar({
-  selected,
-  onSelect,
-}: {
-  selected: Dayjs | null;
-  onSelect: (value: Dayjs | null) => void;
-}) {
-  return (
-    <Calendar
-      mode="single"
-      selected={selected ? selected.toDate() : undefined}
-      onSelect={(newValue) => {
-        if (!newValue) return;
-        onSelect(dayjs(newValue));
-      }}
-    />
   );
 }
 

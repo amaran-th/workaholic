@@ -224,7 +224,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
                 <div className="flex gap-2">
                   <CalendarSelect
                     label="시작일"
-                    selectedDate={
+                    selected={
                       newSprintForm.startDate
                         ? dayjs(newSprintForm.startDate)
                         : null
@@ -239,7 +239,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
                   />
                   <CalendarSelect
                     label="종료일"
-                    selectedDate={
+                    selected={
                       newSprintForm.endDate
                         ? dayjs(newSprintForm.endDate)
                         : null
