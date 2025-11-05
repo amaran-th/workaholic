@@ -301,7 +301,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
-              <p>Due Date</p>
+              <p>마감 기한</p>
               {data.dueDate ? (
                 <p className="text-xs text-sub-text">
                   {dayjs(data.dueDate)?.format("YYYY-MM-DD HH:mm")}
@@ -333,7 +333,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
         <div className="relative flex cursor-default gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='text-'])]:text-muted-foreground [&_svg:not([class*='size-'])]:size-4">
           <NotebookPen />
           <div className="w-full">
-            <p>Memo</p>
+            <p>메모</p>
             <FlexibleTextArea
               text={memo}
               setText={setMemo}

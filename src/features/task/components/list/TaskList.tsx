@@ -115,7 +115,7 @@ function TaskList() {
               <TableHead className="min-w-[240px]">스프린트</TableHead>
               <TableHead className="min-w-[160px]">시작일</TableHead>
               <TableHead className="min-w-[160px]">종료일</TableHead>
-              <TableHead className="min-w-[160px]">마감일</TableHead>
+              <TableHead className="min-w-[160px]">마감 기한</TableHead>
               <TableHead className="min-w-[300px]">메모</TableHead>
               <TableHead className="min-w-[300px]">기록</TableHead>
               <TableHead className="min-w-[100px]" />

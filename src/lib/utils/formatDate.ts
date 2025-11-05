@@ -11,6 +11,7 @@ export const formatDDayString = (
 
   const diffDays = target.startOf("day").diff(criteria.startOf("day"), "day");
   const diffHours = target.diff(criteria, "hour");
+  const diffMinutes = target.diff(criteria, "minute");
   console.log(
     criteria,
     targetDate,
@@ -20,7 +21,12 @@ export const formatDDayString = (
   );
 
   if (diffDays > 0) return `D-${diffDays}`;
-  if (diffDays === 0) return `${diffHours}시간`;
+  if (diffDays === 0) {
+    if (diffHours > 0) return `${diffHours}시간`;
+    if (diffHours === 0) {
+      if (diffMinutes >= 0) return `${diffMinutes}분`;
+    }
+  }
   return null; // 이미 지난 날짜
 };
 
