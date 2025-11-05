@@ -42,15 +42,6 @@ export type TaskListItem = TaskWithRelations & {
   priority: number | null;
 };
 
-export interface CreateTaskInput {
-  memberId: string;
-  content: string;
-  categoryId: string;
-  parentTaskId?: string;
-  positionX?: number;
-  positionY?: number;
-}
-
 export type NodeType = "task" | "quadrant" | "axisEndPoint" | "intersection";
 export type EdgeType = "axis";
 
@@ -60,7 +51,6 @@ export type PostTaskRequest = {
   positionX: number | null;
   positionY: number | null;
   dueDate: Date | null;
-  memberId: string;
   categoryId: string | null;
   parentTaskId: string | null;
   sprintId: string | null;
@@ -78,7 +68,6 @@ export type PatchTaskRequest = Partial<{
 }>;
 
 export type TaskFilter = {
-  memberId: string;
   categoryId?: string | null;
   sprintId?: string | null;
   date?: string | null;

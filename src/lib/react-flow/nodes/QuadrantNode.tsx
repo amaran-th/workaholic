@@ -4,7 +4,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { postTaskApi } from "@/features/task/task-api";
 import { PostTaskRequest } from "@/features/task/types/task";
 import { HEADER_HEIGHT } from "@/lib/data";
@@ -35,7 +34,6 @@ function QuadrantNode({
     positionX: number;
     positionY: number;
   } | null>(null);
-  const [session] = useAtom(sessionAtom);
   const [defaultCategoryId] = useAtom(defaultCategoryIdAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
@@ -66,7 +64,6 @@ function QuadrantNode({
 
     addTask.mutate({
       date: selectedDate?.format("YYYY-MM-DD") ?? null,
-      memberId: session!.user.id!,
       categoryId: defaultCategoryId,
       ...contextPos,
       content: "",

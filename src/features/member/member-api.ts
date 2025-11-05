@@ -9,46 +9,39 @@ import {
 
 const API_BASE = "/api/member";
 
-const getMemberInfoApi = async (params: { memberId?: string }) => {
-  const res = await fetch(`${API_BASE}/${params.memberId}`);
+const getMemberInfoApi = async () => {
+  const res = await fetch(API_BASE);
   if (!res.ok) throw new Error("회원 정보 불러오기 실패");
   return res.json();
 };
 
-export const useGetInfoQuery = (params: { memberId?: string }) =>
+export const useGetInfoQuery = () =>
   useQuery<MemberInfo, Error>({
-    queryKey: ["member-info", params],
-    queryFn: () => getMemberInfoApi(params),
-    enabled: !!params.memberId,
+    queryKey: ["member-info"],
+    queryFn: () => getMemberInfoApi(),
   });
 
-const getCenterPositionApi = async (params: { memberId: string }) => {
-  const res = await fetch(`${API_BASE}/${params.memberId}/position`);
+const getCenterPositionApi = async () => {
+  const res = await fetch(`${API_BASE}/position`);
   if (!res.ok) throw new Error("중심 좌표 불러오기 실패");
   return res.json();
 };
 
-export const useGetCenterPositionQuery = (
-  params: { memberId: string },
-  options?: { enabled?: boolean }
-) =>
+export const useGetCenterPositionQuery = (options?: { enabled?: boolean }) =>
   useQuery<MemberPosition, Error>({
-    queryKey: ["member-position", params],
-    queryFn: () => getCenterPositionApi(params),
+    queryKey: ["member-position"],
+    queryFn: () => getCenterPositionApi(),
     ...options,
   });
 
 export async function patchPositionApi({
-  memberId,
   left,
   right,
   top,
   bottom,
   centerX,
   centerY,
-}: {
-  memberId: string;
-} & Partial<{
+}: Partial<{
   left: number;
   right: number;
   top: number;
@@ -56,7 +49,7 @@ export async function patchPositionApi({
   centerX: number;
   centerY: number;
 }>) {
-  const res = await fetch(`${API_BASE}/${memberId}/position`, {
+  const res = await fetch(`${API_BASE}/position`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ left, right, top, bottom, centerX, centerY }),
@@ -66,13 +59,11 @@ export async function patchPositionApi({
 }
 
 export async function patchMemberInfoApi({
-  id,
   data,
 }: {
-  id: string;
   data: Partial<MemberInfoPatchRequest>;
 }): Promise<MemberInfo> {
-  const res = await fetch(`${API_BASE}/${id}`, {
+  const res = await fetch(`${API_BASE}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),

@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // ✅ 스프린트 목록 조회 (카테고리별)
 export async function GET(req: NextRequest) {
+  const { id: memberId } = await authenticate(req);
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get("categoryId");
-  const memberId = searchParams.get("memberId"); // 선택적으로 멤버 필터도 가능
 
   try {
     if (!categoryId || !memberId) {
@@ -30,8 +31,9 @@ export async function GET(req: NextRequest) {
 // ✅ 스프린트 생성
 export async function POST(req: NextRequest) {
   try {
+    const { id: memberId } = await authenticate(req);
     const body = await req.json();
-    const { name, startDate, endDate, categoryId, memberId } = body;
+    const { name, startDate, endDate, categoryId } = body;
 
     if (!name || !categoryId || !memberId) {
       return new NextResponse("Missing required fields", { status: 400 });

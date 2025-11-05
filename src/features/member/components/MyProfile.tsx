@@ -11,10 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { notifyNotSupportedFeature } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAtom } from "jotai";
 import { Loader2, Plus } from "lucide-react";
 import Image from "next/image";
 import { ReactNode, useCallback, useEffect, useState } from "react";
@@ -37,7 +35,6 @@ function InfoRow({ label, children }: InfoRowProps) {
 }
 
 function MyProfile() {
-  const [session] = useAtom(sessionAtom);
   const queryClient = useQueryClient();
   const [form, setForm] = useState<{ name: string; bio: string }>({
     name: "",
@@ -46,13 +43,13 @@ function MyProfile() {
   const [isEdited, setIsEdited] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const { data, isFetching } = useGetInfoQuery({ memberId: session?.user.id });
+  const { data, isFetching } = useGetInfoQuery();
 
   const patchMemberInfo = useMutation({
     mutationFn: patchMemberInfoApi,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["member-info", { memberId: session?.user.id }],
+        queryKey: ["member-info"],
       });
     },
     onSettled: () => {
@@ -74,15 +71,13 @@ function MyProfile() {
   );
 
   const handleSave = useCallback(async () => {
-    if (!session?.user?.id) return;
     setIsSaving(true);
     patchMemberInfo.mutate({
-      id: session?.user.id,
       data: {
         ...form,
       },
     });
-  }, [session, patchMemberInfo, form]);
+  }, [patchMemberInfo, form]);
 
   return (
     <Card className="w-full max-w-3xl">

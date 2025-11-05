@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { convertKSTDateToUTC } from "@/lib/utils/formatDate";
-import { NextResponse } from "next/server";
-export async function GET(req: Request) {
+import { NextRequest, NextResponse } from "next/server";
+export async function GET(req: NextRequest) {
   try {
+    const { id: memberId } = await authenticate(req);
     const { searchParams } = new URL(req.url);
 
-    const memberId = searchParams.get("memberId");
     const categoryId = searchParams.get("categoryId");
     const sprintId = searchParams.get("sprintId");
 

@@ -7,33 +7,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import {
   postCategoryApi,
   useGetCategoriesQuery,
 } from "@/features/category/category-api";
 import { Color } from "@/lib/data";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAtom } from "jotai";
 import { Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import CategoryItem from "./CategoryItem";
 import ColorPicker from "./ColorPicker";
 
 function MyCategory() {
   const queryClient = useQueryClient();
-  const [session] = useAtom(sessionAtom);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<Color>("white");
   const [openedId, setOpenedId] = useState<string | null>(null);
-  const { data } = useGetCategoriesQuery({ memberId: session?.user.id });
+  const { data } = useGetCategoriesQuery();
 
-  const memberId = useMemo(() => session?.user.id, [session]);
   const postCategory = useMutation({
     mutationFn: postCategoryApi,
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ["categories", { memberId }],
+        queryKey: ["categories"],
       }),
   });
 
@@ -42,7 +38,6 @@ function MyCategory() {
     postCategory.mutate({
       name: newCategoryName,
       color: selectedColor,
-      memberId: memberId!,
     });
     setNewCategoryName("");
   };

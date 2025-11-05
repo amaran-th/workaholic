@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { CalendarSelect } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import {
   deleteCategoryApi,
   patchCategoryApi,
@@ -12,14 +11,12 @@ import { postSprintApi, useGetSprintQuery } from "@/features/sprint/sprint-api";
 import { Color } from "@/lib/data";
 import dayjs from "@/lib/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAtom } from "jotai";
 import { Pencil, Plus, Reply, Save, Trash2 } from "lucide-react";
 import {
   Dispatch,
   SetStateAction,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import ColorPicker from "./ColorPicker";
@@ -32,7 +29,6 @@ interface CategoryItemProps {
 }
 function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
   const queryClient = useQueryClient();
-  const [session] = useAtom(sessionAtom);
   const [editable, setEditable] = useState<boolean>(false);
   const [form, setForm] = useState<{ name: string; color: Color }>({
     name: category.name,
@@ -49,18 +45,15 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
   });
 
   const { data: sprints, isFetching } = useGetSprintQuery({
-    memberId: session?.user.id,
     categoryId: open ? category.id : null,
   });
-
-  const memberId = useMemo(() => session?.user.id, [session]);
 
   const patchCategory = useMutation({
     mutationFn: patchCategoryApi,
     onSuccess: () => {
       setEditable(false);
       queryClient.invalidateQueries({
-        queryKey: ["categories", { memberId }],
+        queryKey: ["categories"],
       });
     },
   });
@@ -69,7 +62,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
     mutationFn: deleteCategoryApi,
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: ["categories", { memberId }],
+        queryKey: ["categories"],
       }),
   });
 
@@ -82,7 +75,7 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
         endDate: null,
       });
       queryClient.invalidateQueries({
-        queryKey: ["sprints", { memberId, categoryId: category.id }],
+        queryKey: ["sprints", { categoryId: category.id }],
       });
     },
   });
@@ -121,7 +114,6 @@ function CategoryItem({ category, open, setOpen }: CategoryItemProps) {
     postSprint.mutate({
       ...newSprintForm,
       categoryId: category.id,
-      memberId: memberId!,
     });
   };
 

@@ -12,6 +12,5 @@ export interface PostSprintRequest {
   name: string;
   startDate: string | null;
   endDate: string | null;
-  memberId: string;
   categoryId: string;
 }

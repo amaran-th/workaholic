@@ -1,12 +1,10 @@
 import { MemberPosition } from "@/features/member/types/member";
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function GET(req: NextRequest) {
+  const { id } = await authenticate(req);
 
   const member = await prisma.member.findUnique({
     where: { id },
@@ -26,16 +24,13 @@ export async function GET(
   return NextResponse.json(member);
 }
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id: memberId } = await context.params;
+export async function PATCH(req: NextRequest) {
+  const { id } = await authenticate(req);
   const { centerX, centerY, left, right, top, bottom } =
     (await req.json()) as MemberPosition;
 
   const updatedMember = await prisma.member.update({
-    where: { id: memberId },
+    where: { id },
     data: { centerX, centerY, left, right, top, bottom },
   });
 

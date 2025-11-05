@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import { useGetCategoriesQuery } from "@/features/category/category-api";
 import { useGetSprintQuery } from "@/features/sprint/sprint-api";
 import { Color, colorMap, quadrantColorMap } from "@/lib/data";
@@ -44,16 +43,12 @@ import { DayStatusBadge } from "./StatusBadge";
 
 function TaskListRow({ task }: { task: TaskListItem }) {
   const queryClient = useQueryClient();
-  const [session] = useAtom(sessionAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const [open, setOpen] = useState<boolean>(false);
 
-  const { data: categories } = useGetCategoriesQuery({
-    memberId: session?.user.id ?? "",
-  });
+  const { data: categories } = useGetCategoriesQuery();
   const { data: sprints } = useGetSprintQuery({
-    memberId: session?.user.id,
     categoryId: task.category?.id,
   });
 

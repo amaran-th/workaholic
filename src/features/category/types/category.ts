@@ -9,7 +9,6 @@ export interface Category {
 }
 
 export interface PostCategoryRequest {
-  memberId: string;
   name: string;
   color: string;
 }

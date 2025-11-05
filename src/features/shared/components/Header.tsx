@@ -1,19 +1,13 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import MyButton from "@/features/shared/components/MyButton";
 import { HEADER_HEIGHT } from "@/lib/data";
+import { getServerUser } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils/utils";
-import { useAtom } from "jotai";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import NavigationButton from "./NavigationButton";
 
-export default function Header() {
-  const [session, setSession] = useAtom(sessionAtom);
-  const router = useRouter();
-
+export default async function Header() {
+  const session = await getServerUser();
   return (
     <div
       className={cn("bg-black text-white flex p-2 items-center gap-4")}
@@ -24,13 +18,21 @@ export default function Header() {
       </div>
       <div className="flex-1 rounded-3xl bg-gray-600 p-1 px-4">광고</div>
       <div className="">
-        {!!session?.access_token ? (
+        {session ? (
           <div className="flex gap-1">
             <NavigationButton />
             <MyButton />
           </div>
         ) : (
-          <Button onClick={() => router.push("/login")}>로그인</Button>
+          <Link href="/login">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-white border-white/40"
+            >
+              로그인
+            </Button>
+          </Link>
         )}
       </div>
     </div>

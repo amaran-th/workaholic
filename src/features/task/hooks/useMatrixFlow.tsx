@@ -1,6 +1,5 @@
 "use client";
 
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
 import {
   patchPositionApi,
   useGetCenterPositionQuery,
@@ -27,7 +26,6 @@ export default function useMatrixFlow(
   setNodes: Dispatch<SetStateAction<Node[]>>,
   setEdges: Dispatch<SetStateAction<Edge[]>>
 ) {
-  const [session] = useAtom(sessionAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
@@ -41,10 +39,7 @@ export default function useMatrixFlow(
     top: number;
     bottom: number;
   }>({ left: 0, right: 0, top: 0, bottom: 0 });
-  const { data: centerPosition } = useGetCenterPositionQuery(
-    { memberId: session!.user.id! },
-    { enabled: !!session?.user?.id }
-  );
+  const { data: centerPosition } = useGetCenterPositionQuery();
 
   useEffect(() => {
     if (centerPosition) {
@@ -53,10 +48,7 @@ export default function useMatrixFlow(
       setLocalBorderPosition(rest);
     }
   }, [centerPosition]);
-  const { data: tasks } = useGetMatrixTasksQuery(taskFilter, {
-    enabled: !!session?.user?.id,
-  });
-  console.log(tasks);
+  const { data: tasks } = useGetMatrixTasksQuery(taskFilter);
 
   const [currentNodesFetching, setCurrentNodesFetching] =
     useState<boolean>(true);
@@ -81,7 +73,7 @@ export default function useMatrixFlow(
     onSuccess: () => {
       // 성공 시 캐시 무효화 → centerPosition 재조회
       queryClient.invalidateQueries({
-        queryKey: ["member-position", { memberId: session!.user.id }],
+        queryKey: ["member-position"],
       });
     },
   });
@@ -641,13 +633,9 @@ export default function useMatrixFlow(
       // console.log("센터 드래그 종료:", node.position);
 
       // 1) API 호출해서 새 좌표 저장
-      updatePosition.mutate({
-        memberId: session!.user.id!,
-        ...localBorderPosition,
-      });
+      updatePosition.mutate(localBorderPosition);
     } else if (node.type === "intersection") {
       updatePosition.mutate({
-        memberId: session!.user.id!,
         centerX: localCenterPosition.x,
         centerY: localCenterPosition.y,
       });

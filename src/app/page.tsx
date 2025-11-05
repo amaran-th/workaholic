@@ -1,7 +1,5 @@
 "use client";
 
-import { withProtectedRoute } from "@/features/auth/components/ProtectedRoute";
-
 import TaskMatrix from "@/features/task/components/matrix/TaskMatrix";
 import { HEADER_HEIGHT } from "@/lib/data";
 import { useEffect, useState } from "react";
@@ -21,4 +19,4 @@ function MatrixPage() {
   );
 }
 
-export default withProtectedRoute(MatrixPage);
+export default MatrixPage;

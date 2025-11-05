@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { authenticate } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function GET(req: NextRequest) {
+  const { id } = await authenticate(req);
 
   const member = await prisma.member.findUnique({
     where: { id },
@@ -24,12 +22,9 @@ export async function GET(
 }
 
 // PATCH /api/member/:id
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest) {
   try {
-    const { id } = await context.params;
+    const { id } = await authenticate(req);
     const body = await req.json();
 
     // 업데이트 가능한 필드만 필터링

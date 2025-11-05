@@ -1,27 +1,32 @@
-"use client";
-import { sessionAtom } from "@/features/auth/store/sessionAtom";
-import { useAtomValue } from "jotai";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+// app/(protected)/layout.tsx
+import { getServerSession } from "@/lib/supabase/server";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { ReactNode } from "react";
 
-// P extends object 제약 추가
-export function withProtectedRoute<P extends object>(
-  WrappedComponent: React.ComponentType<P>
-) {
-  const Component = (props: P) => {
-    const session = useAtomValue(sessionAtom);
-    const router = useRouter();
+interface ProtectedServerProps {
+  children: ReactNode;
+  excludePaths?: string[]; // 인증 체크 제외할 경로
+}
 
-    useEffect(() => {
-      if (!session) {
-        router.replace("/login");
-      }
-    }, [session, router]);
+export default async function AuthProvider({
+  children,
+  excludePaths = ["/login", "/register"],
+}: ProtectedServerProps) {
+  // 요청 경로 가져오기
+  const pathname = (await headers()).get("x-invoke-pathname") || "";
+  // headers()에는 url 관련 정보가 없으므로, app router 서버 컴포넌트에서는 layout에서 pathname을 props로 넘기는 경우가 있음.
 
-    if (!session) return null; // 로그인 전에는 렌더링 안 함
+  // 제외 경로면 바로 렌더링
+  if (excludePaths.includes(pathname)) {
+    return <>{children}</>;
+  }
 
-    return <WrappedComponent {...props} />;
-  };
+  const session = await getServerSession();
 
-  return Component;
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <>{children}</>;
 }
