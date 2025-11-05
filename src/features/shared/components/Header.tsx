@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils/utils";
 import Link from "next/link";
 import NavigationButton from "./NavigationButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function Header() {
   const session = await getServerUser();
   return (
