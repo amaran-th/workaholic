@@ -3,6 +3,7 @@
 import AxisEdge from "@/lib/react-flow/edges/AxisEdge";
 import AxisEndPointNode from "@/lib/react-flow/nodes/AxisEndPointNode";
 import IntersectionNode from "@/lib/react-flow/nodes/IntersectionNode";
+import LabelNode from "@/lib/react-flow/nodes/LabelNode";
 import QuadrantNode from "@/lib/react-flow/nodes/QuadrantNode";
 import TaskNode from "@/lib/react-flow/nodes/TaskNode";
 import {
@@ -21,6 +22,7 @@ const nodeTypes = {
   quadrant: QuadrantNode,
   axisEndPoint: AxisEndPointNode,
   intersection: IntersectionNode,
+  label: LabelNode,
 };
 
 const edgeTypes = {

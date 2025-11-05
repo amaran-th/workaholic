@@ -43,7 +43,12 @@ export type TaskListItem = TaskWithRelations & {
   priority: number | null;
 };
 
-export type NodeType = "task" | "quadrant" | "axisEndPoint" | "intersection";
+export type NodeType =
+  | "task"
+  | "quadrant"
+  | "axisEndPoint"
+  | "intersection"
+  | "label";
 export type EdgeType = "axis";
 
 export type PostTaskRequest = {

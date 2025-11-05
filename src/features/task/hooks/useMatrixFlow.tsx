@@ -79,7 +79,7 @@ export default function useMatrixFlow(
   });
 
   useEffect(() => {
-    if (!tasks || !localCenterPosition || !localBorderPosition) {
+    if (!tasks || !centerPosition) {
       return;
     }
 
@@ -87,15 +87,15 @@ export default function useMatrixFlow(
       {
         id: "q1",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.top,
+          x: centerPosition.left,
+          y: centerPosition.top,
         },
         data: {
           bgcolor: quadrantColorMap.FIRST,
-          right: localCenterPosition.x,
-          left: localBorderPosition.left,
-          bottom: localCenterPosition.y,
-          top: localBorderPosition.top,
+          right: centerPosition.centerX,
+          left: centerPosition.left,
+          bottom: centerPosition.centerY,
+          top: centerPosition.top,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -105,15 +105,15 @@ export default function useMatrixFlow(
       {
         id: "q2",
         position: {
-          x: localCenterPosition.x,
-          y: localBorderPosition.top,
+          x: centerPosition.centerX,
+          y: centerPosition.top,
         },
         data: {
           bgcolor: quadrantColorMap.SECOND,
-          right: localBorderPosition.right,
-          left: localCenterPosition.x,
-          bottom: localCenterPosition.y,
-          top: localBorderPosition.top,
+          right: centerPosition.right,
+          left: centerPosition.centerX,
+          bottom: centerPosition.centerY,
+          top: centerPosition.top,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -123,15 +123,15 @@ export default function useMatrixFlow(
       {
         id: "q3",
         position: {
-          x: localBorderPosition.left,
-          y: localCenterPosition.y,
+          x: centerPosition.left,
+          y: centerPosition.centerY,
         },
         data: {
           bgcolor: quadrantColorMap.THIRD,
-          right: localCenterPosition.x,
-          left: localBorderPosition.left,
-          bottom: localBorderPosition.bottom,
-          top: localCenterPosition.y,
+          right: centerPosition.centerX,
+          left: centerPosition.left,
+          bottom: centerPosition.bottom,
+          top: centerPosition.centerY,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -141,15 +141,15 @@ export default function useMatrixFlow(
       {
         id: "q4",
         position: {
-          x: localCenterPosition.x,
-          y: localCenterPosition.y,
+          x: centerPosition.centerX,
+          y: centerPosition.centerY,
         },
         data: {
           bgcolor: quadrantColorMap.FORTH,
-          right: localBorderPosition.right,
-          left: localCenterPosition.x,
-          bottom: localBorderPosition.bottom,
-          top: localCenterPosition.y,
+          right: centerPosition.right,
+          left: centerPosition.centerX,
+          bottom: centerPosition.bottom,
+          top: centerPosition.centerY,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -159,12 +159,12 @@ export default function useMatrixFlow(
       {
         id: "left",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.top,
+          x: centerPosition.left,
+          y: centerPosition.top,
         },
         data: {
           type: "horizon",
-          height: localBorderPosition.bottom - localBorderPosition.top,
+          height: centerPosition.bottom - centerPosition.top,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -173,12 +173,12 @@ export default function useMatrixFlow(
       {
         id: "right",
         position: {
-          x: localBorderPosition.right,
-          y: localBorderPosition.top,
+          x: centerPosition.right,
+          y: centerPosition.top,
         },
         data: {
           type: "horizon",
-          height: localBorderPosition.bottom - localBorderPosition.top,
+          height: centerPosition.bottom - centerPosition.top,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -187,12 +187,12 @@ export default function useMatrixFlow(
       {
         id: "top",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.top,
+          x: centerPosition.left,
+          y: centerPosition.top,
         },
         data: {
           type: "vertical",
-          width: localBorderPosition.right - localBorderPosition.left,
+          width: centerPosition.right - centerPosition.left,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -201,12 +201,12 @@ export default function useMatrixFlow(
       {
         id: "bottom",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.bottom,
+          x: centerPosition.left,
+          y: centerPosition.bottom,
         },
         data: {
           type: "vertical",
-          width: localBorderPosition.right - localBorderPosition.left,
+          width: centerPosition.right - centerPosition.left,
         },
         type: "axisEndPoint",
         deletable: false,
@@ -215,8 +215,8 @@ export default function useMatrixFlow(
       {
         id: "top-left",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.top,
+          x: centerPosition.left,
+          y: centerPosition.top,
         },
         data: {
           type: "top-left",
@@ -228,8 +228,8 @@ export default function useMatrixFlow(
       {
         id: "top-right",
         position: {
-          x: localBorderPosition.right,
-          y: localBorderPosition.top,
+          x: centerPosition.right,
+          y: centerPosition.top,
         },
         data: {
           type: "top-right",
@@ -241,8 +241,8 @@ export default function useMatrixFlow(
       {
         id: "bottom-left",
         position: {
-          x: localBorderPosition.left,
-          y: localBorderPosition.bottom,
+          x: centerPosition.left,
+          y: centerPosition.bottom,
         },
         data: {
           type: "bottom-left",
@@ -254,8 +254,8 @@ export default function useMatrixFlow(
       {
         id: "bottom-right",
         position: {
-          x: localBorderPosition.right,
-          y: localBorderPosition.bottom,
+          x: centerPosition.right,
+          y: centerPosition.bottom,
         },
         data: {
           type: "bottom-right",
@@ -267,17 +267,41 @@ export default function useMatrixFlow(
       {
         id: "center",
         position: {
-          x: localCenterPosition.x,
-          y: localCenterPosition.y,
+          x: centerPosition.centerX,
+          y: centerPosition.centerY,
         },
         data: { dragOver: "default" },
         type: "intersection",
         deletable: false,
         selectable: false,
         extent: [
-          [localBorderPosition.left, localBorderPosition.top], // 최소 좌표
-          [localBorderPosition.right + 24, localBorderPosition.bottom + 24], // 최대 좌표
+          [centerPosition.left, centerPosition.top], // 최소 좌표
+          [centerPosition.right + 24, centerPosition.bottom + 24], // 최대 좌표
         ],
+      },
+      {
+        id: "top-label",
+        position: {
+          x: centerPosition.centerX - 56,
+          y: centerPosition.top - 48,
+        },
+        data: { value: "중요한 일" },
+        type: "label",
+        deletable: false,
+        selectable: false,
+        draggable: false,
+      },
+      {
+        id: "left-label",
+        position: {
+          x: centerPosition.left - 128,
+          y: centerPosition.centerY - 16,
+        },
+        data: { value: "급한 일" },
+        type: "label",
+        deletable: false,
+        selectable: false,
+        draggable: false,
       },
     ];
 
@@ -366,14 +390,7 @@ export default function useMatrixFlow(
 
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [
-    tasks,
-    centerPosition,
-    localCenterPosition,
-    localBorderPosition,
-    setNodes,
-    setEdges,
-  ]);
+  }, [tasks, centerPosition, setNodes, setEdges]);
 
   useEffect(() => {
     const { x: centerX, y: centerY } = localCenterPosition;
@@ -426,6 +443,18 @@ export default function useMatrixFlow(
               left: centerX,
               top: centerY,
             },
+          };
+        }
+        if (n.id === "top-label") {
+          return {
+            ...n,
+            position: { ...n.position, x: centerX - 56 },
+          };
+        }
+        if (n.id === "left-label") {
+          return {
+            ...n,
+            position: { ...n.position, y: centerY - 16 },
           };
         }
         return n;
@@ -551,6 +580,18 @@ export default function useMatrixFlow(
           return {
             ...n,
             position: { x: right, y: bottom },
+          };
+        }
+        if (n.id === "top-label") {
+          return {
+            ...n,
+            position: { ...n.position, y: top - 48 },
+          };
+        }
+        if (n.id === "left-label") {
+          return {
+            ...n,
+            position: { ...n.position, x: left - 128 },
           };
         }
         return n;
