@@ -29,6 +29,7 @@ import {
   Check,
   NotebookPen,
   RefreshCw,
+  Settings,
   Trash,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -48,6 +49,7 @@ import {
   TaskWithRelations,
 } from "@/features/task/types/task";
 import dayjs from "@/lib/dayjs";
+import Link from "next/link";
 import {
   defaultCategoryIdAtom,
   selectedDateAtom,
@@ -58,9 +60,10 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
   const queryClient = useQueryClient();
   const [taskFilter] = useAtom(taskFilterAtom);
 
-  const { data: categories } = useGetCategoriesQuery();
+  const { data: categories, isFetching: isCategoryFetching } =
+    useGetCategoriesQuery();
 
-  const { data: sprints } = useGetSprintQuery({
+  const { data: sprints, isFetching: isSprintFetching } = useGetSprintQuery({
     categoryId: task.category?.id,
   });
 
@@ -83,14 +86,13 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
   return (
     <>
       <ContextMenuItem keepOpen>
-        {" "}
         <Select
           value={task.category?.id}
           onValueChange={(value: string) => {
             setDefaultCategoryId(value);
             patchTask.mutate({
               taskId: task.id,
-              data: { categoryId: value },
+              data: { categoryId: value, sprintId: null },
             });
           }}
         >
@@ -98,19 +100,53 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
             <SelectValue placeholder="카테고리 선택" />
           </SelectTrigger>
           <SelectContent>
-            {categories?.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block rounded-full size-3"
-                    style={{
-                      backgroundColor: colorMap[category.color as Color].sub,
-                    }}
-                  />
-                  {category.name}
-                </div>
-              </SelectItem>
-            ))}
+            <div className="flex justify-between">
+              <Button
+                variant="text"
+                onClick={() => {
+                  patchTask.mutate({
+                    taskId: task.id,
+                    data: { categoryId: null, sprintId: null },
+                  });
+                }}
+                className="px-1.5 text-sm text-muted-foreground"
+              >
+                선택 해제
+              </Button>
+              <Link href="/my">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-end text-muted-foreground"
+                >
+                  <Settings size={16} />
+                </Button>
+              </Link>
+            </div>
+            <SelectSeparator />
+            {isCategoryFetching ? (
+              <p className="py-1 text-xs text-center text-muted-foreground">
+                불러오는 중...
+              </p>
+            ) : categories?.length ? (
+              categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-block rounded-full size-3"
+                      style={{
+                        backgroundColor: colorMap[category.color as Color].sub,
+                      }}
+                    />
+                    {category.name}
+                  </div>
+                </SelectItem>
+              ))
+            ) : (
+              <p className="py-1 text-xs text-center text-muted-foreground">
+                등록된 카테고리가 없습니다.
+              </p>
+            )}
           </SelectContent>
         </Select>
       </ContextMenuItem>
@@ -131,26 +167,56 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="clear">
-              <span className="text-muted-foreground">선택 해제</span>
-            </SelectItem>
+            <div className="flex justify-between">
+              <Button
+                variant="text"
+                onClick={() => {
+                  patchTask.mutate({
+                    taskId: task.id,
+                    data: { sprintId: null },
+                  });
+                }}
+                className="px-1.5 text-sm text-muted-foreground"
+              >
+                선택 해제
+              </Button>
+              <Link href="/my">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-end text-muted-foreground"
+                >
+                  <Settings size={16} />
+                </Button>
+              </Link>
+            </div>
             <SelectSeparator />
-            {sprints?.map((sprint) => (
-              <SelectItem key={sprint.id} value={sprint.id}>
-                <div className="flex flex-col">
-                  <p>{sprint.name}</p>
-                  <p className="text-secondary text-xs">
-                    {sprint.startDate
-                      ? dayjs(sprint.startDate).format("YYYY-MM-DD")
-                      : ""}
-                    ~
-                    {sprint.endDate
-                      ? dayjs(sprint.endDate).format("YYYY-MM-DD")
-                      : ""}
-                  </p>
-                </div>
-              </SelectItem>
-            ))}
+            {isSprintFetching ? (
+              <p className="py-1 text-xs text-center text-muted-foreground">
+                불러오는 중...
+              </p>
+            ) : sprints?.length ? (
+              sprints?.map((sprint) => (
+                <SelectItem key={sprint.id} value={sprint.id}>
+                  <div className="flex flex-col">
+                    <p>{sprint.name}</p>
+                    <p className="text-secondary text-xs">
+                      {sprint.startDate
+                        ? dayjs(sprint.startDate).format("YYYY-MM-DD")
+                        : ""}
+                      {!!sprint.startDate || (!!sprint.endDate && "~")}
+                      {sprint.endDate
+                        ? dayjs(sprint.endDate).format("YYYY-MM-DD")
+                        : ""}
+                    </p>
+                  </div>
+                </SelectItem>
+              ))
+            ) : (
+              <p className="py-1 text-xs text-center text-muted-foreground">
+                등록된 스프린트가 없습니다.
+              </p>
+            )}
           </SelectContent>
         </Select>
       </ContextMenuItem>

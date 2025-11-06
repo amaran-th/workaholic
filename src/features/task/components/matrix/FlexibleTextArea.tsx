@@ -46,6 +46,8 @@ function FlexibleTextArea({
     <textarea
       ref={textareaRef}
       onChange={handleChange}
+      onDragStartCapture={(e) => e.stopPropagation()}
+      onMouseDownCapture={(e) => e.stopPropagation()}
       className={cn(
         "min-w-0 w-full resize-none overflow-hidden focus-visible:outline-0 placeholder:text-placeholder",
         "min-h-0 h-auto",

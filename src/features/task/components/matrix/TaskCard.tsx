@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import {
   Check,
+  ChevronRight,
   CornerRightDown,
   NotebookPen,
   RefreshCw,
@@ -96,7 +97,7 @@ function TaskCard({
           });
         }}
         placeholder="업무를 작성해주세요."
-        className="font-bold grow"
+        className="text-sm grow"
       />
       <div className="text-xs">
         {!!data.memo && (
@@ -108,12 +109,31 @@ function TaskCard({
 
       <div className="flex gap-1 items-center justify-between">
         {data.category ? (
-          <CategoryBadge customColor={data.category.color} size="xs">
-            {data.category.name}
-          </CategoryBadge>
+          <div className="flex gap-0.5 items-center">
+            <CategoryBadge customColor={data.category.color} size="sm">
+              {data.category.name}
+            </CategoryBadge>
+            {data.sprint ? (
+              <>
+                <ChevronRight
+                  size="16"
+                  style={{ color: colorMap[data.category.color].primary }}
+                />
+                <p
+                  className="text-xs font-bold"
+                  style={{ color: colorMap[data.category.color].sub }}
+                >
+                  {data.sprint.name}
+                </p>
+              </>
+            ) : (
+              <div />
+            )}
+          </div>
         ) : (
           <div />
         )}
+
         {StatusIcon}
       </div>
     </Card>
