@@ -33,7 +33,7 @@ export default function SignupForm({
       await postMemberApi({ email, password, name });
 
       router.push("/signup/success");
-      // TODO 이메일 확인하라는 문구 모달을  페이지로 리다이렉트
+      // TODO 이메일 확인하라는 문구 모달을 페이지로 리다이렉트
     } catch (err: unknown) {
       if (err instanceof Error) alert(err.message);
     } finally {

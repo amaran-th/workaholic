@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils/utils";
+import { CheckIcon } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const viewModes = [
@@ -18,28 +19,38 @@ const viewModes = [
 export default function NavigationButton() {
   const router = useRouter();
   const pathname = usePathname();
-  const handleSelect = (value: string) => {
-    router.push(value);
-  };
+
   return (
-    <Select
-      onValueChange={handleSelect}
-      value={
-        viewModes.map((mode) => mode.path).includes(pathname)
-          ? pathname
-          : undefined
-      }
-    >
-      <SelectTrigger className="w-[190px]">
-        <SelectValue placeholder="뷰 모드 선택" />
-      </SelectTrigger>
-      <SelectContent>
-        {viewModes.map((mode) => (
-          <SelectItem key={mode.path} value={mode.path}>
-            {mode.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <>
+      <Popover>
+        <PopoverTrigger className="w-[190px] border text-sm px-3 py-2 rounded-md text-left">
+          {viewModes.find((mode) => pathname === mode.path)?.label ??
+            "뷰 모드 선택"}
+        </PopoverTrigger>
+        <PopoverContent className="w-[190px] p-0">
+          <div className="flex flex-col p-1 gap-1">
+            {viewModes.map((mode) => (
+              <Link
+                key={mode.path}
+                href={mode.path}
+                className={cn(
+                  "text-sm px-3 py-2 relative rounded-md hover:bg-accent",
+                  {
+                    "bg-accent": pathname === mode.path,
+                  }
+                )}
+              >
+                {mode.label}
+                {pathname === mode.path && (
+                  <span className="absolute right-2 top-0 h-full flex size-3.5 items-center justify-center">
+                    <CheckIcon className="size-4" />
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
   );
 }

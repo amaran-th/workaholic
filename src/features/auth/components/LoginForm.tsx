@@ -22,7 +22,7 @@ export default function LoginForm({
     e.preventDefault();
 
     try {
-      const { session } = await loginMemberApi({ email, password });
+      await loginMemberApi({ email, password });
       queryClient.invalidateQueries({ queryKey: ["session"] });
       router.push("/");
       router.refresh();

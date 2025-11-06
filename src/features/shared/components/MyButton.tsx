@@ -9,6 +9,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { CircleUser, LogOut } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logoutMemberApi } from "../../auth/auth-api";
 import { sessionAtom } from "../../auth/store/sessionAtom";
@@ -41,8 +42,8 @@ export default function MyButton() {
         <CircleUser size={32} strokeWidth={1} />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => router.push("/my")}>
-          마이페이지
+        <DropdownMenuItem>
+          <Link href="/my"> 마이페이지</Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout} className="text-error">
           <LogOut className="text-error" />
