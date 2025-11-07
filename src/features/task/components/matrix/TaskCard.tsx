@@ -121,7 +121,7 @@ function TaskCard({
                 />
                 <p
                   className="text-xs font-bold"
-                  style={{ color: colorMap[data.category.color].sub }}
+                  style={{ color: colorMap[data.category.color].primary }}
                 >
                   {data.sprint.name}
                 </p>
