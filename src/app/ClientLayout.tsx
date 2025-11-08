@@ -1,6 +1,5 @@
 "use client";
 
-import SessionInitializer from "@/features/auth/components/SessionInitializer";
 import QueryProvider from "@/providers/QueryProvider";
 import StateProvider from "@/providers/StateProvider";
 import { ReactFlowProvider } from "@xyflow/react";
@@ -16,7 +15,6 @@ export default function ClientLayout({
     <ReactFlowProvider>
       <QueryProvider>
         <StateProvider>
-          <SessionInitializer />
           <main>{children}</main>
           <ToastContainer
             position="bottom-right"
