@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
     "/api/auth/login",
     "/api/auth/signup",
     "/login",
-    "/register",
+    "/signup",
   ];
   if (excludePaths.some((path) => pathname.startsWith(path))) {
     return res;
