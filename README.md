@@ -2,6 +2,7 @@
 ## 프로젝트 소개
 아이젠하우어 매트릭스* 기반의 업무 관리 플랫폼
 
+- [서비스 URL](https://workaholic-rho.vercel.app/)
 - [블로그](https://amaran-th.vercel.app/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%9D%BC%EC%9D%84%ED%95%98%EC%9E%90%20-%201.%20%EA%B8%B0%ED%9A%8D%EA%B3%BC%201%EC%B0%A8%20MVP%20%EB%B0%B0%ED%8F%AC)에서 프로젝트에 대한 더 자세한 이야기를 볼 수 있습니다.
 
 
