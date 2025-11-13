@@ -1,3 +1,4 @@
+import Footer from "@/features/shared/components/Footer";
 import Header from "@/features/shared/components/Header";
 import type { Metadata } from "next";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,10 +17,18 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="font-nanum antialiased">
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1344097825263008"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
+      <body className="font-nanum antialiased flex flex-col min-h-svh h-full">
         <ClientLayout>
           <Header />
-          {children}
+          <main className="grow">{children}</main>
+          <Footer />
         </ClientLayout>
       </body>
     </html>

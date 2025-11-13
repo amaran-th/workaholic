@@ -15,7 +15,7 @@ export default function ClientLayout({
     <ReactFlowProvider>
       <QueryProvider>
         <StateProvider>
-          <main>{children}</main>
+          {children}
           <ToastContainer
             position="bottom-right"
             autoClose={3000}
