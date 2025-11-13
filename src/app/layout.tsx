@@ -17,6 +17,13 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1344097825263008"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body className="font-nanum antialiased flex flex-col min-h-svh h-full">
         <ClientLayout>
           <Header />
