@@ -107,25 +107,29 @@ function TaskCard({
         )}
       </div>
 
-      <div className="flex gap-1 items-center justify-between">
+      <div className="flex gap-1 items-end justify-between">
         {data.category ? (
-          <div className="flex gap-0.5 items-center">
-            <CategoryBadge customColor={data.category.color} size="sm">
+          <div className="flex flex-wrap flex-1 min-w-0 gap-0.5 items-center">
+            <CategoryBadge
+              customColor={data.category.color}
+              size="sm"
+              className="max-w-full inline truncate"
+            >
               {data.category.name}
             </CategoryBadge>
             {data.sprint ? (
-              <>
+              <div className="flex items-center min-w-0">
                 <ChevronRight
-                  size="16"
+                  size="12"
                   style={{ color: colorMap[data.category.color].primary }}
                 />
                 <p
-                  className="text-xs font-bold"
+                  className="text-[10px] font-bold truncate"
                   style={{ color: colorMap[data.category.color].primary }}
                 >
                   {data.sprint.name}
                 </p>
-              </>
+              </div>
             ) : (
               <div />
             )}
@@ -133,7 +137,6 @@ function TaskCard({
         ) : (
           <div />
         )}
-
         {StatusIcon}
       </div>
     </Card>
