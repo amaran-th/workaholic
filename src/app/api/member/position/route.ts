@@ -9,8 +9,6 @@ export async function GET(req: NextRequest) {
   const member = await prisma.member.findUnique({
     where: { id },
     select: {
-      centerX: true,
-      centerY: true,
       left: true,
       right: true,
       top: true,
@@ -26,17 +24,14 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const { id } = await authenticate(req);
-  const { centerX, centerY, left, right, top, bottom } =
-    (await req.json()) as MemberPosition;
+  const { left, right, top, bottom } = (await req.json()) as MemberPosition;
 
   const updatedMember = await prisma.member.update({
     where: { id },
-    data: { centerX, centerY, left, right, top, bottom },
+    data: { left, right, top, bottom },
   });
 
   return NextResponse.json({
-    centerX: updatedMember.centerX,
-    centerY: updatedMember.centerY,
     left: updatedMember.left,
     right: updatedMember.right,
     top: updatedMember.top,

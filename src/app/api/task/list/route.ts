@@ -49,8 +49,6 @@ export async function GET(req: NextRequest) {
       member = await prisma.member.findUnique({
         where: { id: memberId },
         select: {
-          centerX: true,
-          centerY: true,
           left: true,
           right: true,
           top: true,
@@ -96,10 +94,10 @@ export async function GET(req: NextRequest) {
 
       let priority = null;
       if (member && isPinned) {
-        if (posX <= member.centerX && posY <= member.centerY) priority = 1;
-        else if (posX > member.centerX && posY <= member.centerY) priority = 2;
-        else if (posX <= member.centerX && posY > member.centerY) priority = 3;
-        else if (posX > member.centerX && posY > member.centerY) priority = 4;
+        if (posX <= 0 && posY <= 0) priority = 1;
+        else if (posX > 0 && posY <= 0) priority = 2;
+        else if (posX <= 0 && posY > 0) priority = 3;
+        else if (posX > 0 && posY > 0) priority = 4;
       }
 
       return { ...rest, pinned: !!isPinned, priority };

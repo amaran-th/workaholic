@@ -29,10 +29,6 @@ export default function useMatrixFlow(
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
-  const [localCenterPosition, setLocalCenterPosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
   const [localBorderPosition, setLocalBorderPosition] = useState<{
     left: number;
     right: number;
@@ -43,9 +39,7 @@ export default function useMatrixFlow(
 
   useEffect(() => {
     if (centerPosition) {
-      const { centerX: x, centerY: y, ...rest } = centerPosition;
-      setLocalCenterPosition({ x, y });
-      setLocalBorderPosition(rest);
+      setLocalBorderPosition(centerPosition);
     }
   }, [centerPosition]);
   const { data: tasks } = useGetMatrixTasksQuery(taskFilter);
@@ -92,9 +86,9 @@ export default function useMatrixFlow(
         },
         data: {
           bgcolor: quadrantColorMap.FIRST,
-          right: centerPosition.centerX,
+          right: 0,
           left: centerPosition.left,
-          bottom: centerPosition.centerY,
+          bottom: 0,
           top: centerPosition.top,
         },
         className: "quadrant-node",
@@ -105,14 +99,14 @@ export default function useMatrixFlow(
       {
         id: "q2",
         position: {
-          x: centerPosition.centerX,
+          x: 0,
           y: centerPosition.top,
         },
         data: {
           bgcolor: quadrantColorMap.SECOND,
           right: centerPosition.right,
-          left: centerPosition.centerX,
-          bottom: centerPosition.centerY,
+          left: 0,
+          bottom: 0,
           top: centerPosition.top,
         },
         className: "quadrant-node",
@@ -124,14 +118,14 @@ export default function useMatrixFlow(
         id: "q3",
         position: {
           x: centerPosition.left,
-          y: centerPosition.centerY,
+          y: 0,
         },
         data: {
           bgcolor: quadrantColorMap.THIRD,
-          right: centerPosition.centerX,
+          right: 0,
           left: centerPosition.left,
           bottom: centerPosition.bottom,
-          top: centerPosition.centerY,
+          top: 0,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -141,15 +135,15 @@ export default function useMatrixFlow(
       {
         id: "q4",
         position: {
-          x: centerPosition.centerX,
-          y: centerPosition.centerY,
+          x: 0,
+          y: 0,
         },
         data: {
           bgcolor: quadrantColorMap.FORTH,
           right: centerPosition.right,
-          left: centerPosition.centerX,
+          left: 0,
           bottom: centerPosition.bottom,
-          top: centerPosition.centerY,
+          top: 0,
         },
         className: "quadrant-node",
         type: "quadrant",
@@ -267,22 +261,19 @@ export default function useMatrixFlow(
       {
         id: "center",
         position: {
-          x: centerPosition.centerX,
-          y: centerPosition.centerY,
+          x: 0,
+          y: 0,
         },
-        data: { dragOver: "default" },
+        data: {},
         type: "intersection",
         deletable: false,
         selectable: false,
-        extent: [
-          [centerPosition.left, centerPosition.top], // 최소 좌표
-          [centerPosition.right + 24, centerPosition.bottom + 24], // 최대 좌표
-        ],
+        draggable: false,
       },
       {
         id: "top-label",
         position: {
-          x: centerPosition.centerX - 56,
+          x: -56,
           y: centerPosition.top - 48,
         },
         data: { value: "중요한 일" },
@@ -295,7 +286,7 @@ export default function useMatrixFlow(
         id: "left-label",
         position: {
           x: centerPosition.left - 128,
-          y: centerPosition.centerY - 16,
+          y: -16,
         },
         data: { value: "급한 일" },
         type: "label",
@@ -393,88 +384,9 @@ export default function useMatrixFlow(
   }, [tasks, centerPosition, setNodes, setEdges]);
 
   useEffect(() => {
-    const { x: centerX, y: centerY } = localCenterPosition;
-    setNodes((prev) =>
-      prev.map((n) => {
-        if (n.id === "center") {
-          return {
-            ...n,
-            position: { x: centerX, y: centerY },
-          };
-        }
-        if (n.id === "q1") {
-          return {
-            ...n,
-            data: {
-              ...n.data,
-              right: centerX,
-              bottom: centerY,
-            },
-          };
-        }
-        if (n.id === "q2") {
-          return {
-            ...n,
-            position: { ...n.position, x: centerX },
-            data: {
-              ...n.data,
-              left: centerX,
-              bottom: centerY,
-            },
-          };
-        }
-        if (n.id === "q3") {
-          return {
-            ...n,
-            position: { ...n.position, y: centerY },
-            data: {
-              ...n.data,
-              right: centerX,
-              top: centerY,
-            },
-          };
-        }
-        if (n.id === "q4") {
-          return {
-            ...n,
-            position: { x: centerX, y: centerY },
-            data: {
-              ...n.data,
-              left: centerX,
-              top: centerY,
-            },
-          };
-        }
-        if (n.id === "top-label") {
-          return {
-            ...n,
-            position: { ...n.position, x: centerX - 56 },
-          };
-        }
-        if (n.id === "left-label") {
-          return {
-            ...n,
-            position: { ...n.position, y: centerY - 16 },
-          };
-        }
-        return n;
-      })
-    );
-  }, [localCenterPosition, setNodes]);
-
-  useEffect(() => {
     const { left, right, top, bottom } = localBorderPosition;
     setNodes((prev) =>
       prev.map((n) => {
-        if (n.id === "center") {
-          return {
-            ...n,
-            extent: [
-              [left, top], // 최소 좌표
-              [right + 24, bottom + 24], // 최대 좌표
-            ],
-          };
-        }
         if (n.id === "q1") {
           return {
             ...n,
@@ -603,58 +515,53 @@ export default function useMatrixFlow(
     (_: React.MouseEvent, node: Node) => {
       if (!selectedDate || node.type === "task") return;
 
-      if (node.id === "center") {
-        setLocalCenterPosition({
-          x: node.position.x,
-          y: node.position.y,
-        });
-      } else if (node.id === "left") {
+      if (node.id === "left") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          left: Math.min(node.position.x, localCenterPosition.x),
+          left: Math.min(node.position.x, 0),
         }));
       } else if (node.id === "right") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          right: Math.max(node.position.x, localCenterPosition.x),
+          right: Math.max(node.position.x, 0),
         }));
       } else if (node.id === "top") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          top: Math.min(node.position.y, localCenterPosition.y),
+          top: Math.min(node.position.y, 0),
         }));
       } else if (node.id === "bottom") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          bottom: Math.max(node.position.y, localCenterPosition.y),
+          bottom: Math.max(node.position.y, 0),
         }));
       } else if (node.id === "top-left") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          top: Math.min(node.position.y, localCenterPosition.y),
-          left: Math.min(node.position.x, localCenterPosition.x),
+          top: Math.min(node.position.y, 0),
+          left: Math.min(node.position.x, 0),
         }));
       } else if (node.id === "top-right") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          top: Math.min(node.position.y, localCenterPosition.y),
-          right: Math.max(node.position.x, localCenterPosition.x),
+          top: Math.min(node.position.y, 0),
+          right: Math.max(node.position.x, 0),
         }));
       } else if (node.id === "bottom-left") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          bottom: Math.max(node.position.y, localCenterPosition.y),
-          left: Math.min(node.position.x, localCenterPosition.x),
+          bottom: Math.max(node.position.y, 0),
+          left: Math.min(node.position.x, 0),
         }));
       } else if (node.id === "bottom-right") {
         setLocalBorderPosition((prev) => ({
           ...prev,
-          bottom: Math.max(node.position.y, localCenterPosition.y),
-          right: Math.max(node.position.x, localCenterPosition.x),
+          bottom: Math.max(node.position.y, 0),
+          right: Math.max(node.position.x, 0),
         }));
       }
     },
-    [localCenterPosition, selectedDate]
+    [selectedDate]
   );
 
   const handleNodeDragStop = async (event: React.MouseEvent, node: Node) => {
@@ -671,15 +578,8 @@ export default function useMatrixFlow(
         "bottom-right",
       ].includes(node.id)
     ) {
-      // console.log("센터 드래그 종료:", node.position);
-
       // 1) API 호출해서 새 좌표 저장
       updatePosition.mutate(localBorderPosition);
-    } else if (node.type === "intersection") {
-      updatePosition.mutate({
-        centerX: localCenterPosition.x,
-        centerY: localCenterPosition.y,
-      });
     } else if (node.type === "task") {
       // console.log("업무 드래그 종료:", node, selectedDate, node.position);
       patchTask.mutate({

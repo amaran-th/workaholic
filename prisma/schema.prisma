@@ -12,16 +12,14 @@ model Member {
   email      String     @unique
   password   String?
   name       String?
-  centerX    Float      @default(0)
-  centerY    Float      @default(0)
   bio        String?
   avatarUrl  String?
   createdAt  DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
-  bottom     Float      @default(0)
-  left       Float      @default(0)
-  right      Float      @default(0)
-  top        Float      @default(0)
+  bottom     Float      @default(500)
+  left       Float      @default(-500)
+  right      Float      @default(500)
+  top        Float      @default(-500)
   categories Category[]
   sprints    Sprint[]
   tasks      Task[]
