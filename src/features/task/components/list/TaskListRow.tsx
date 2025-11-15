@@ -197,7 +197,9 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               }}
               color="progress"
               variant={
-                getDayTaskStatus(task) === DayTaskStatus.DOING
+                [DayTaskStatus.DOING, DayTaskStatus.COMPLETED].includes(
+                  getDayTaskStatus(task)
+                )
                   ? "default"
                   : "outline"
               }
@@ -205,7 +207,10 @@ function TaskListRow({ task }: { task: TaskListItem }) {
             >
               <RefreshCw
                 className={cn("text-progress", {
-                  "text-white": getDayTaskStatus(task) === DayTaskStatus.DOING,
+                  "text-white": [
+                    DayTaskStatus.DOING,
+                    DayTaskStatus.COMPLETED,
+                  ].includes(getDayTaskStatus(task)),
                 })}
               />
               작업 중
@@ -228,11 +233,6 @@ function TaskListRow({ task }: { task: TaskListItem }) {
                   ? "default"
                   : "outline"
               }
-              disabled={
-                ![DayTaskStatus.DOING, DayTaskStatus.COMPLETED].includes(
-                  getDayTaskStatus(task)
-                )
-              }
             >
               <Check
                 className={cn("text-success", {
@@ -253,12 +253,15 @@ function TaskListRow({ task }: { task: TaskListItem }) {
           }}
         >
           <SelectTrigger
-            className="max-h-fit w-[180px] focus-within:pl-0 data-[state=open]:pl-0"
+            className="max-h-fit focus-within:pl-0 data-[state=open]:pl-0"
             cell
           >
             <SelectValue>
               {task.category ? (
-                <CategoryBadge customColor={task.category.color}>
+                <CategoryBadge
+                  customColor={task.category.color}
+                  className="max-w-[180px] block truncate"
+                >
                   {task.category.name}
                 </CategoryBadge>
               ) : (
@@ -271,7 +274,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               <SelectItem key={category.id} value={category.id}>
                 <div className="flex items-center gap-2">
                   <span
-                    className="inline-block rounded-full size-3"
+                    className="max-w-[240px] inline-block rounded-full size-3"
                     style={{
                       backgroundColor: colorMap[category.color as Color].sub,
                     }}
@@ -290,10 +293,16 @@ function TaskListRow({ task }: { task: TaskListItem }) {
             patchTask.mutate({ taskId: task.id, data: { sprintId: value } });
           }}
         >
-          <SelectTrigger className="max-h-fit w-[180px]" cell>
+          <SelectTrigger
+            className="max-h-fit focus-within:pl-0 data-[state=open]:pl-0"
+            cell
+          >
             <SelectValue placeholder="-">
               {task.sprint ? (
-                <Badge variant="secondary" className="bg-gray-200">
+                <Badge
+                  variant="secondary"
+                  className="bg-gray-200 max-w-[180px] truncate block"
+                >
                   {task.sprint.name}
                 </Badge>
               ) : (

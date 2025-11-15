@@ -105,8 +105,8 @@ function TaskList() {
               <TableHead />
               <TableHead className="min-w-[400px]">제목</TableHead>
               <TableHead>상태</TableHead>
-              <TableHead className="min-w-[180px]">카테고리</TableHead>
-              <TableHead className="min-w-[240px]">스프린트</TableHead>
+              <TableHead className="min-w-0 w-[180px]">카테고리</TableHead>
+              <TableHead className="min-w-0 w-[180px]">스프린트</TableHead>
               <TableHead className="min-w-[160px]">계획일</TableHead>
               <TableHead className="min-w-[160px]">시작일</TableHead>
               <TableHead className="min-w-[160px]">종료일</TableHead>

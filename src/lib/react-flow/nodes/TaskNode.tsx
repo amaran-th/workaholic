@@ -353,7 +353,6 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             }}
             color="success"
             variant={isCompleted ? "default" : "outline"}
-            disabled={!isDoing}
           >
             <Check
               className={cn("text-success", {
