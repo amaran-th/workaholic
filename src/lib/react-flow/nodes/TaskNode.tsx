@@ -40,6 +40,7 @@ import TaskCard from "@/features/task/components/matrix/TaskCard";
 import {
   deleteTaskApi,
   patchTaskApi,
+  patchTaskEndDateApi,
   patchTaskStartDateApi,
   toggleCompleteStamp,
   toggleDoingStamp,
@@ -50,6 +51,7 @@ import {
 } from "@/features/task/types/task";
 import dayjs from "@/lib/dayjs";
 import Link from "next/link";
+import { toast } from "react-toastify";
 import {
   defaultCategoryIdAtom,
   selectedDateAtom,
@@ -232,6 +234,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
   const [planDate, setPlanDate] = useState<string | null>(data.createdAt);
   const [startDate, setStartDate] = useState<string | null>(data.startDate);
+  const [endDate, setEndDate] = useState<string | null>(data.endDate);
 
   const patchTask = useMutation({
     mutationFn: ({
@@ -254,6 +257,21 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
       queryClient.invalidateQueries({
         queryKey: ["matrix-tasks", taskFilter],
       });
+    },
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const patchTaskEndDate = useMutation({
+    mutationFn: patchTaskEndDateApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["matrix-tasks", taskFilter],
+      });
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 
@@ -392,6 +410,9 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                   data: { createdAt: newValue },
                 });
               }}
+              {...(data.startDate
+                ? { disabled: { after: new Date(data.startDate) } }
+                : {})}
             />
           </ContextMenuSubContent>
         </ContextMenuSub>
@@ -427,7 +448,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 ) {
                   patchTaskStartDate.mutate({
                     taskId: data.id,
-                    data: { date: null, selectedDate: selectedDate.format() },
+                    data: { date: null },
                   });
                 }
               }}
@@ -442,11 +463,65 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                     taskId: data.id,
                     data: {
                       date: newValue,
-                      selectedDate: selectedDate.format(),
                     },
                   });
                 }
               }}
+              {...(data.endDate
+                ? { disabled: { after: new Date(data.endDate) } }
+                : {})}
+            />
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub
+          onOpenChange={(open) => {
+            if (open) {
+              setEndDate(data.endDate);
+            }
+          }}
+        >
+          <ContextMenuSubTrigger className="items-start">
+            <CalendarClock />
+            <div>
+              <p>종료일</p>
+              {data.endDate ? (
+                <p className="text-xs text-sub-text">
+                  {dayjs(data.endDate)?.format("YYYY-MM-DD HH:mm")}
+                </p>
+              ) : (
+                <p className="text-xs text-placeholder">YYYY-MM-DD HH:mm</p>
+              )}
+            </div>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <DateTimePicker
+              value={endDate ? dayjs(endDate) : null}
+              onClear={() => {
+                if (!selectedDate) return;
+
+                patchTaskEndDate.mutate({
+                  taskId: data.id,
+                  data: { date: null },
+                });
+              }}
+              onSubmit={(newValue: string) => {
+                if (!selectedDate) return;
+                if (
+                  confirm(
+                    "종료일을 변경하면 변경되는 날짜 이후의 작업 기록이 모두 사라집니다.\n 정말로 변경하시겠습니까?"
+                  )
+                ) {
+                  patchTaskEndDate.mutate({
+                    taskId: data.id,
+                    data: {
+                      date: newValue,
+                    },
+                  });
+                }
+              }}
+              {...(data.startDate
+                ? { disabled: { before: new Date(data.startDate) } }
+                : {})}
             />
           </ContextMenuSubContent>
         </ContextMenuSub>

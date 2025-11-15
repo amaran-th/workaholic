@@ -28,9 +28,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Check, Pin, PinOff, RefreshCw, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import {
   deleteTaskApi,
   patchTaskApi,
+  patchTaskEndDateApi,
   patchTaskStartDateApi,
   toggleCompleteStamp,
   toggleDoingStamp,
@@ -74,6 +76,21 @@ function TaskListRow({ task }: { task: TaskListItem }) {
       queryClient.invalidateQueries({
         queryKey: ["list-tasks", taskFilter],
       });
+    },
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const patchTaskEndDate = useMutation({
+    mutationFn: patchTaskEndDateApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 
@@ -363,7 +380,6 @@ function TaskListRow({ task }: { task: TaskListItem }) {
                 taskId: task.id,
                 data: {
                   date: newValue?.format() ?? null,
-                  selectedDate: selectedDate.format(),
                 },
               });
             }
@@ -375,7 +391,38 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        {task.endDate ? dayjs(task.endDate).format("YYYY-MM-DD") : "-"}
+        <CalendarSelect
+          selected={task.endDate ? dayjs(task.endDate) : null}
+          placeholder="-"
+          onSelect={(newValue) => {
+            if (!selectedDate) return;
+            if (newValue) {
+              if (
+                confirm(
+                  "종료일을 변경하면 변경되는 날짜 이후의 작업 기록이 모두 사라집니다.\n 정말로 변경하시겠습니까?"
+                )
+              ) {
+                patchTaskEndDate.mutate({
+                  taskId: task.id,
+                  data: {
+                    date: newValue.format(),
+                  },
+                });
+              }
+            } else {
+              patchTaskEndDate.mutate({
+                taskId: task.id,
+                data: {
+                  date: null,
+                },
+              });
+            }
+          }}
+          {...(task.startDate
+            ? { disabled: { before: new Date(task.startDate) } }
+            : {})}
+          cell
+        />
       </TableCell>
       <TableCell>
         <CalendarSelect

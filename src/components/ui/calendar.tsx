@@ -225,7 +225,7 @@ function SingleCalendar({
   selected,
   onSelect,
   ...props
-}: React.ComponentProps<typeof Calendar> & {
+}: Omit<React.ComponentProps<typeof Calendar>, "selected" | "onSelect"> & {
   selected: Dayjs | null;
   onSelect: (value: Dayjs | null) => void;
 }) {
@@ -305,7 +305,8 @@ function DateTimePicker({
   value,
   onClear,
   onSubmit,
-}: {
+  ...props
+}: Omit<React.ComponentProps<typeof Calendar>, "selected" | "onSelect"> & {
   value: Dayjs | null;
   onClear?: () => void;
   onSubmit: (newValue: string) => void;
@@ -320,6 +321,7 @@ function DateTimePicker({
   return (
     <div className="p-2">
       <SingleCalendar
+        {...props}
         selected={dayjs(date)}
         onSelect={(newValue) => {
           setDate(newValue ? newValue.format("YYYY-MM-DD") : null);
