@@ -371,6 +371,7 @@ export default function useMatrixFlow(
 
     for (const task of tasks) {
       const { id, positionX: x, positionY: y } = task;
+      if (!x || !y) continue;
       addNode({
         id,
         data: task,

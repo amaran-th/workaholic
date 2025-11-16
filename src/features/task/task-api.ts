@@ -1,6 +1,7 @@
 "use client";
 
 import { toQueryString } from "@/lib/utils/queryString";
+import { Task } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   PatchTaskRequest,
@@ -46,14 +47,23 @@ export const useGetListTasksQuery = (
     ...options,
   });
 
-export const postTaskApi = async (params: PostTaskRequest) => {
-  const res = await fetch(API_BASE, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
-  });
-  if (!res.ok) throw new Error("Task 생성 실패");
-  return res.json();
+export const postTaskApi = async (
+  params: PostTaskRequest,
+  retry = 3
+): Promise<Task> => {
+  try {
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+    return res.json();
+  } catch (err: any) {
+    if (retry > 0 && err.code === "P2002") {
+      return await postTaskApi(params, retry - 1);
+    }
+    throw err;
+  }
 };
 
 export const patchTaskApi = async ({

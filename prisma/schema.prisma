@@ -57,6 +57,7 @@ model Task {
   subTasks      Task[]         @relation("SubTasks")
   sprint        Sprint?        @relation(fields: [sprintId], references: [id])
   taskPositions TaskPosition[]
+  @@unique([memberId, no])
 }
 
 model DoStamp {

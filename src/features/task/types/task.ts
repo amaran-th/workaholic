@@ -28,8 +28,8 @@ export type TaskWithRelations = {
   endDate: string | null;
   dueDate: string | null;
   comment: string | null;
-  positionX: number;
-  positionY: number;
+  positionX: number | null;
+  positionY: number | null;
   category: Category | null;
   memberId: string;
   parentTask: { id: string; content: string } | null;

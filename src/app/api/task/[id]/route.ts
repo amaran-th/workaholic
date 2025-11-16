@@ -9,45 +9,56 @@ export async function PATCH(
     const { id } = await context.params;
     const body = await req.json();
 
-    const allowedFields = [
+    if (!id) return new NextResponse("Task id is required", { status: 400 });
+
+    // 업데이트 가능한 필드 목록
+    const allowedFields = new Set([
       "content",
       "memo",
       "comment",
       "dueDate",
       "categoryId",
-      "parentTaskId",
       "sprintId",
-      "createdAt",
-    ];
+      "parentTaskId",
+    ]);
 
-    // TODO createdAt이 startDate보다 뒤에 오면 안됨
     const data: Record<string, any> = {};
-
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) data[field] = body[field];
+    for (const [key, value] of Object.entries(body)) {
+      if (allowedFields.has(key) && value !== undefined) {
+        data[key] = value;
+      }
     }
-    const existing = await prisma.task.findUnique({
-      where: { id },
-      select: { categoryId: true },
+
+    const result = await prisma.$transaction(async (tx) => {
+      const task = await tx.task.findUnique({
+        where: { id },
+        select: {
+          categoryId: true,
+        },
+      });
+
+      if (!task) throw new Error("Task not found");
+      if (
+        "categoryId" in data &&
+        data.categoryId !== null &&
+        data.categoryId !== task.categoryId
+      ) {
+        data.sprintId = null;
+      }
+      const updatedTask = await tx.task.update({
+        where: { id },
+        data,
+      });
+
+      return updatedTask;
     });
 
-    if (!existing) {
-      return new NextResponse("Task not found", { status: 404 });
-    }
-
-    if ("categoryId" in data && data.categoryId !== existing.categoryId) {
-      data.sprintId = null;
-    }
-
-    const updated = await prisma.task.update({
-      where: { id },
-      data,
-    });
-
-    return NextResponse.json(updated);
+    return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-    return new NextResponse("Failed to update task", { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Failed to update task";
+    return new NextResponse(message, { status: 500 });
   }
 }
 export async function DELETE(
