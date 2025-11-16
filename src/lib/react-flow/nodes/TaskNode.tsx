@@ -27,6 +27,7 @@ import { useAtom } from "jotai";
 import {
   CalendarClock,
   Check,
+  CopyPlus,
   NotebookPen,
   RefreshCw,
   Settings,
@@ -42,11 +43,13 @@ import {
   patchTaskApi,
   patchTaskEndDateApi,
   patchTaskStartDateApi,
+  postTaskApi,
   toggleCompleteStamp,
   toggleDoingStamp,
 } from "@/features/task/task-api";
 import {
   PatchTaskRequest,
+  PostTaskRequest,
   TaskWithRelations,
 } from "@/features/task/types/task";
 import dayjs from "@/lib/dayjs";
@@ -238,6 +241,15 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const [memo, setMemo] = useState<string>(data.memo ?? "");
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
 
+  const addTask = useMutation({
+    mutationFn: (vars: PostTaskRequest) => postTaskApi(vars),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["matrix-tasks", taskFilter],
+      });
+    },
+  });
+
   const patchTask = useMutation({
     mutationFn: ({
       taskId,
@@ -300,6 +312,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
       });
     },
   });
+
   const toggleComplete = useMutation({
     mutationFn: ({
       taskId,
@@ -388,7 +401,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             <CalendarClock />
             <div>
               <p>계획일</p>
-              {data.createdAt ? ( // TODO 계획일/시작일 선택 시 최대 날짜 설정
+              {data.createdAt ? (
                 <p className="text-xs text-sub-text">
                   {dayjs(data.createdAt)?.format("YYYY-MM-DD HH:mm")}
                 </p>
@@ -572,6 +585,28 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </div>
         </div>
         <ContextMenuSeparator />
+        <ContextMenuItem
+          onClick={() => {
+            if (!selectedDate) return;
+
+            addTask.mutate({
+              date: selectedDate.isSame(dayjs(), "d")
+                ? null
+                : selectedDate.format("YYYY-MM-DD"),
+              categoryId: data.category?.id ?? null,
+              sprintId: data.sprint?.id ?? null,
+              positionX: data.positionX + 30,
+              positionY: data.positionY + 30,
+              content: data.content,
+              memo: data.memo ?? "",
+              dueDate: data.dueDate ? new Date(data.dueDate) : null,
+              parentTaskId: data.parentTask?.id ?? null,
+            });
+          }}
+        >
+          <CopyPlus />
+          업무 복제
+        </ContextMenuItem>
         <ContextMenuItem
           onClick={() => {
             deleteTask.mutate({ taskId: data.id });
