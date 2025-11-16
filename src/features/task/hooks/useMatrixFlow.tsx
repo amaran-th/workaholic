@@ -47,7 +47,7 @@ export default function useMatrixFlow(
   const [currentNodesFetching, setCurrentNodesFetching] =
     useState<boolean>(true);
 
-  const patchTask = useMutation({
+  const patchTaskPosition = useMutation({
     mutationFn: ({
       taskId,
       data,
@@ -582,12 +582,12 @@ export default function useMatrixFlow(
       updatePosition.mutate(localBorderPosition);
     } else if (node.type === "task") {
       // console.log("업무 드래그 종료:", node, selectedDate, node.position);
-      patchTask.mutate({
+      patchTaskPosition.mutate({
         taskId: node.id,
         data: {
           positionX: node.position.x,
           positionY: node.position.y,
-          positionDate: selectedDate.format(),
+          positionDate: selectedDate.format("YYYY-MM-DD"),
         },
       });
     }
