@@ -53,7 +53,7 @@ import dayjs from "@/lib/dayjs";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import {
-  defaultCategoryIdAtom,
+  defaultTaskInfoAtom,
   selectedDateAtom,
   taskFilterAtom,
 } from "../store/matrixAtom";
@@ -84,14 +84,18 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
     },
   });
 
-  const [, setDefaultCategoryId] = useAtom(defaultCategoryIdAtom);
+  const [, setDefaultTaskInfo] = useAtom(defaultTaskInfoAtom);
   return (
     <>
       <ContextMenuItem keepOpen>
         <Select
           value={task.category?.id}
           onValueChange={(value: string) => {
-            setDefaultCategoryId(value);
+            setDefaultTaskInfo((prev) => ({
+              ...prev,
+              categoryId: value,
+              sprintId: null,
+            }));
             patchTask.mutate({
               taskId: task.id,
               data: { categoryId: value, sprintId: null },
@@ -156,6 +160,7 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
         <Select
           value={task.sprint?.id}
           onValueChange={(value: string) => {
+            setDefaultTaskInfo((prev) => ({ ...prev, sprintId: value }));
             patchTask.mutate({
               taskId: task.id,
               data: { sprintId: value === "clear" ? null : value },
@@ -232,9 +237,6 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
   const queryClient = useQueryClient();
   const [memo, setMemo] = useState<string>(data.memo ?? "");
   const [dueDate, setDueDate] = useState<string | null>(data.dueDate);
-  const [planDate, setPlanDate] = useState<string | null>(data.createdAt);
-  const [startDate, setStartDate] = useState<string | null>(data.startDate);
-  const [endDate, setEndDate] = useState<string | null>(data.endDate);
 
   const patchTask = useMutation({
     mutationFn: ({
@@ -381,13 +383,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </Button>
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuSub
-          onOpenChange={(open) => {
-            if (open) {
-              setPlanDate(data.createdAt);
-            }
-          }}
-        >
+        <ContextMenuSub>
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
@@ -403,7 +399,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <DateTimePicker
-              value={planDate ? dayjs(planDate) : null}
+              value={data.createdAt ? dayjs(data.createdAt) : null}
               onSubmit={(newValue: string) => {
                 patchTask.mutate({
                   taskId: data.id,
@@ -416,13 +412,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
             />
           </ContextMenuSubContent>
         </ContextMenuSub>
-        <ContextMenuSub
-          onOpenChange={(open) => {
-            if (open) {
-              setStartDate(data.startDate);
-            }
-          }}
-        >
+        <ContextMenuSub>
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
@@ -438,7 +428,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <DateTimePicker
-              value={startDate ? dayjs(startDate) : null}
+              value={data.startDate ? dayjs(data.startDate) : null}
               onClear={() => {
                 if (!selectedDate) return;
                 if (
@@ -468,18 +458,17 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 }
               }}
               {...(data.endDate
-                ? { disabled: { after: new Date(data.endDate) } }
-                : {})}
+                ? {
+                    disabled: {
+                      before: new Date(data.createdAt),
+                      after: new Date(data.endDate),
+                    },
+                  }
+                : { disabled: { before: new Date(data.createdAt) } })}
             />
           </ContextMenuSubContent>
         </ContextMenuSub>
-        <ContextMenuSub
-          onOpenChange={(open) => {
-            if (open) {
-              setEndDate(data.endDate);
-            }
-          }}
-        >
+        <ContextMenuSub>
           <ContextMenuSubTrigger className="items-start">
             <CalendarClock />
             <div>
@@ -495,7 +484,7 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
             <DateTimePicker
-              value={endDate ? dayjs(endDate) : null}
+              value={data.endDate ? dayjs(data.endDate) : null}
               onClear={() => {
                 if (!selectedDate) return;
 

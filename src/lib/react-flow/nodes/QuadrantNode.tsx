@@ -7,13 +7,14 @@ import {
 import { postTaskApi } from "@/features/task/task-api";
 import { PostTaskRequest } from "@/features/task/types/task";
 import { HEADER_HEIGHT } from "@/lib/data";
+import dayjs from "@/lib/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NodeProps, useReactFlow } from "@xyflow/react";
 import { useAtom } from "jotai";
 import { Plus } from "lucide-react";
 import { MouseEvent, useState } from "react";
 import {
-  defaultCategoryIdAtom,
+  defaultTaskInfoAtom,
   selectedDateAtom,
   taskFilterAtom,
 } from "../store/matrixAtom";
@@ -34,7 +35,7 @@ function QuadrantNode({
     positionX: number;
     positionY: number;
   } | null>(null);
-  const [defaultCategoryId] = useAtom(defaultCategoryIdAtom);
+  const [defaultTaskInfo] = useAtom(defaultTaskInfoAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
@@ -60,17 +61,19 @@ function QuadrantNode({
   };
 
   const handleAddTask = () => {
-    if (!contextPos) return;
+    if (!contextPos || !selectedDate) return;
 
     addTask.mutate({
-      date: selectedDate?.format("YYYY-MM-DD") ?? null,
-      categoryId: defaultCategoryId,
+      date: selectedDate.isSame(dayjs(), "d")
+        ? null
+        : selectedDate.format("YYYY-MM-DD"),
+      categoryId: defaultTaskInfo?.categoryId ?? null,
+      sprintId: defaultTaskInfo?.sprintId ?? null,
       ...contextPos,
       content: "",
       memo: "",
       dueDate: null,
       parentTaskId: null,
-      sprintId: null,
     });
   };
   return (

@@ -235,8 +235,7 @@ function SingleCalendar({
       mode="single"
       selected={selected ? selected.toDate() : undefined}
       onSelect={(newValue) => {
-        if (!newValue) return;
-        onSelect(dayjs(newValue));
+        onSelect(newValue ? dayjs(newValue) : null);
       }}
     />
   );
@@ -317,6 +316,11 @@ function DateTimePicker({
   const [time, setTime] = React.useState<string>(
     value ? value.format("HH:mm:ss") : "00:00:00"
   );
+
+  React.useEffect(() => {
+    setDate((value ?? dayjs()).format("YYYY-MM-DD"));
+    setTime(value ? value.format("HH:mm:ss") : "00:00:00");
+  }, [value]);
 
   return (
     <div className="p-2">
