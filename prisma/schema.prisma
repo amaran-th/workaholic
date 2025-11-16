@@ -73,6 +73,8 @@ model TaskPosition {
   taskId    String
   date      String
   task      Task   @relation(fields: [taskId], references: [id])
+  
+  @@unique([taskId, date])
 }
 
 model Sprint {
