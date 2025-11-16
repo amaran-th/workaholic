@@ -6,11 +6,12 @@ import {
 } from "@/features/member/member-api";
 import { quadrantColorMap } from "@/lib/data";
 import {
+  draggingTaskAtom,
   selectedDateAtom,
   taskFilterAtom,
 } from "@/lib/react-flow/store/matrixAtom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Edge, Node } from "@xyflow/react";
+import { Edge, Node, useReactFlow } from "@xyflow/react";
 import { useAtom } from "jotai";
 import {
   Dispatch,
@@ -26,9 +27,12 @@ export default function useMatrixFlow(
   setNodes: Dispatch<SetStateAction<Node[]>>,
   setEdges: Dispatch<SetStateAction<Edge[]>>
 ) {
+  const [draggingTask, setDraggingTask] = useAtom(draggingTaskAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
+  const { screenToFlowPosition } = useReactFlow();
+
   const [localBorderPosition, setLocalBorderPosition] = useState<{
     left: number;
     right: number;
@@ -341,10 +345,7 @@ export default function useMatrixFlow(
       initialNodes.push({
         id,
         position,
-        data: {
-          ...data,
-          dragOver: "default",
-        },
+        data,
         type,
         deletable: false,
       } as Node);
@@ -369,14 +370,15 @@ export default function useMatrixFlow(
       } as Edge);
     };
 
-    for (const task of tasks) {
+    for (const task of tasks.filter(
+      (t) => t.positionX !== null && t.positionY !== null
+    )) {
       const { id, positionX: x, positionY: y } = task;
-      if (!x || !y) continue;
       addNode({
         id,
         data: task,
         type: "task",
-        position: { x, y },
+        position: { x: x!, y: y! },
       });
     }
 
@@ -593,9 +595,45 @@ export default function useMatrixFlow(
       });
     }
   };
+
+  const handleOutsideNodeDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    if (!draggingTask || !selectedDate) {
+      setDraggingTask(null);
+      return;
+    }
+    console.log("test");
+
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+    const { x, y } = screenToFlowPosition({ x: mouseX, y: mouseY });
+    setNodes((prev) => [
+      ...prev,
+      {
+        id: draggingTask.id,
+        position: { x, y },
+        data: draggingTask,
+        type: "task",
+        deletable: false,
+      },
+    ]);
+
+    if (!selectedDate) return;
+
+    patchTaskPosition.mutate({
+      taskId: draggingTask.id,
+      data: {
+        positionX: x,
+        positionY: y,
+        positionDate: selectedDate.format("YYYY-MM-DD"),
+      },
+    });
+    setDraggingTask(null);
+  };
   return {
     currentNodesFetching,
     handleNodeDrag,
     handleNodeDragStop,
+    handleOutsideNodeDrop,
   };
 }

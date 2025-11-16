@@ -22,7 +22,6 @@ import { useGetCategoriesQuery } from "@/features/category/category-api";
 import { Color, colorMap } from "@/lib/data";
 import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { NodeProps } from "@xyflow/react";
 import { useAtom } from "jotai";
 import {
   CalendarClock,
@@ -234,7 +233,7 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
   );
 }
 
-function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
+function TaskNode({ data }: { data: TaskWithRelations }) {
   const [selectedDate] = useAtom(selectedDateAtom);
   const [taskFilter] = useAtom(taskFilterAtom);
   const queryClient = useQueryClient();
@@ -595,8 +594,8 @@ function TaskNode({ data }: NodeProps & { data: TaskWithRelations }) {
                 : selectedDate.format("YYYY-MM-DD"),
               categoryId: data.category?.id ?? null,
               sprintId: data.sprint?.id ?? null,
-              positionX: data.positionX! + 30,
-              positionY: data.positionY! + 30,
+              positionX: data.positionX !== null ? data.positionX + 30 : null,
+              positionY: data.positionY !== null ? data.positionY + 30 : null,
               content: data.content,
               memo: data.memo ?? "",
               dueDate: data.dueDate ? new Date(data.dueDate) : null,

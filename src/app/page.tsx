@@ -1,6 +1,7 @@
 "use client";
 
 import TaskMatrix from "@/features/task/components/matrix/TaskMatrix";
+import TaskStorage from "@/features/task/components/matrix/TaskStorage";
 import { HEADER_HEIGHT } from "@/lib/data";
 import { useEffect, useState } from "react";
 
@@ -13,8 +14,9 @@ function MatrixPage() {
 
   if (!height) return null;
   return (
-    <div style={{ height }}>
+    <div className="flex flex-row-reverse" style={{ height }}>
       <TaskMatrix />
+      <TaskStorage />
     </div>
   );
 }

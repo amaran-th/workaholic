@@ -20,6 +20,7 @@ export async function PATCH(
       "categoryId",
       "sprintId",
       "parentTaskId",
+      "createdAt",
     ]);
 
     const data: Record<string, any> = {};
