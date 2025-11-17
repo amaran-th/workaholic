@@ -14,8 +14,6 @@ export interface SignupResponse {
   id: string;
   email: string;
   name?: string | null;
-  centerX: number;
-  centerY: number;
   createdAt: string;
   updatedAt: string;
 }

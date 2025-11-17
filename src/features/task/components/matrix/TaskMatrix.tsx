@@ -33,10 +33,8 @@ function TaskMatrix() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const { handleNodeDrag, handleNodeDragStop } = useMatrixFlow(
-    setNodes,
-    setEdges
-  );
+  const { handleNodeDrag, handleNodeDragStop, handleOutsideNodeDrop } =
+    useMatrixFlow(setNodes, setEdges);
 
   return (
     <ReactFlow
@@ -49,8 +47,11 @@ function TaskMatrix() {
       // onNodeDragStart={onNodeDragStart}
       onNodeDrag={handleNodeDrag}
       onNodeDragStop={handleNodeDragStop}
-      // onDrop={onDropNode}
-      // onDragOver={onDragOver}
+      onDrop={handleOutsideNodeDrop}
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      }}
       minZoom={0.2}
       maxZoom={2}
       zoomOnDoubleClick={false}

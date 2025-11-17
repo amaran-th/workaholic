@@ -6,9 +6,8 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params;
-    const body = await req.json();
-    const { positionX, positionY, positionDate } = body;
+    const { id: taskId } = await context.params;
+    const { positionX, positionY, positionDate } = await req.json();
 
     if (positionX === undefined || positionY === undefined || !positionDate) {
       return new NextResponse(
@@ -17,32 +16,24 @@ export async function PATCH(
       );
     }
 
-    // taskPosition 목록 조회
-    const taskPositions = await prisma.taskPosition.findMany({
-      where: { taskId: id },
-    });
-
-    // 날짜가 같은 항목 찾기
-    const existing = taskPositions.find((tp) => tp.date === positionDate);
-
-    let result;
-    if (existing) {
-      // 같은 날짜가 있으면 업데이트
-      result = await prisma.taskPosition.update({
-        where: { id: existing.id },
-        data: { positionX, positionY },
-      });
-    } else {
-      // 없으면 새로 생성
-      result = await prisma.taskPosition.create({
-        data: {
-          taskId: id,
-          positionX,
-          positionY,
+    const result = await prisma.taskPosition.upsert({
+      where: {
+        taskId_date: {
+          taskId,
           date: positionDate,
         },
-      });
-    }
+      },
+      update: {
+        positionX,
+        positionY,
+      },
+      create: {
+        taskId,
+        date: positionDate,
+        positionX,
+        positionY,
+      },
+    });
 
     return NextResponse.json(result);
   } catch (error) {

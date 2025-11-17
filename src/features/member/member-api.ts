@@ -39,20 +39,16 @@ export async function patchPositionApi({
   right,
   top,
   bottom,
-  centerX,
-  centerY,
 }: Partial<{
   left: number;
   right: number;
   top: number;
   bottom: number;
-  centerX: number;
-  centerY: number;
 }>) {
   const res = await fetch(`${API_BASE}/position`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ left, right, top, bottom, centerX, centerY }),
+    body: JSON.stringify({ left, right, top, bottom }),
   });
   if (!res.ok) throw new Error("센터 포지션 업데이트 실패");
   return res.json();

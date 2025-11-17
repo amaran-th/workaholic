@@ -1,6 +1,6 @@
 import { Badge, CategoryBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarSelect } from "@/components/ui/calendar";
+import { DateTimeSelect } from "@/components/ui/calendar";
 import { CellInput } from "@/components/ui/input";
 import {
   Popover,
@@ -26,11 +26,13 @@ import {
 import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { Check, Pin, PinOff, RefreshCw, Trash2 } from "lucide-react";
+import { Check, Pin, PinOff, RefreshCw, Star, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import {
   deleteTaskApi,
   patchTaskApi,
+  patchTaskEndDateApi,
   patchTaskStartDateApi,
   toggleCompleteStamp,
   toggleDoingStamp,
@@ -74,6 +76,21 @@ function TaskListRow({ task }: { task: TaskListItem }) {
       queryClient.invalidateQueries({
         queryKey: ["list-tasks", taskFilter],
       });
+    },
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const patchTaskEndDate = useMutation({
+    mutationFn: patchTaskEndDateApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["list-tasks", taskFilter],
+      });
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 
@@ -153,7 +170,12 @@ function TaskListRow({ task }: { task: TaskListItem }) {
   return (
     <TableRow
       key={task.id}
-      className="cursor-pointer hover:bg-accent transition-colors"
+      className={cn(
+        "cursor-pointer transition-all duration-200",
+        task.bookmark
+          ? "bg-amber-50 hover:bg-amber-100/60"
+          : "hover:bg-accent/20"
+      )}
       // onClick={() => console.log("Task 클릭:", task.id)}
     >
       <TableCell align="center">
@@ -164,7 +186,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         )}
       </TableCell>
       <TableCell className="text-secondary">#{task.no}</TableCell>
-      <TableCell className="font-medium truncate">
+      <TableCell className="font-medium truncate ">
         <CellInput
           defaultValue={task.content ?? ""}
           onSubmit={(value) => {
@@ -197,7 +219,9 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               }}
               color="progress"
               variant={
-                getDayTaskStatus(task) === DayTaskStatus.DOING
+                [DayTaskStatus.DOING, DayTaskStatus.COMPLETED].includes(
+                  getDayTaskStatus(task)
+                )
                   ? "default"
                   : "outline"
               }
@@ -205,7 +229,10 @@ function TaskListRow({ task }: { task: TaskListItem }) {
             >
               <RefreshCw
                 className={cn("text-progress", {
-                  "text-white": getDayTaskStatus(task) === DayTaskStatus.DOING,
+                  "text-white": [
+                    DayTaskStatus.DOING,
+                    DayTaskStatus.COMPLETED,
+                  ].includes(getDayTaskStatus(task)),
                 })}
               />
               작업 중
@@ -228,11 +255,6 @@ function TaskListRow({ task }: { task: TaskListItem }) {
                   ? "default"
                   : "outline"
               }
-              disabled={
-                ![DayTaskStatus.DOING, DayTaskStatus.COMPLETED].includes(
-                  getDayTaskStatus(task)
-                )
-              }
             >
               <Check
                 className={cn("text-success", {
@@ -253,12 +275,15 @@ function TaskListRow({ task }: { task: TaskListItem }) {
           }}
         >
           <SelectTrigger
-            className="max-h-fit w-[180px] focus-within:pl-0 data-[state=open]:pl-0"
+            className="max-h-fit focus-within:pl-0 data-[state=open]:pl-0"
             cell
           >
             <SelectValue>
               {task.category ? (
-                <CategoryBadge customColor={task.category.color}>
+                <CategoryBadge
+                  customColor={task.category.color}
+                  className="max-w-[180px] block truncate"
+                >
                   {task.category.name}
                 </CategoryBadge>
               ) : (
@@ -271,7 +296,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               <SelectItem key={category.id} value={category.id}>
                 <div className="flex items-center gap-2">
                   <span
-                    className="inline-block rounded-full size-3"
+                    className="max-w-[240px] inline-block rounded-full size-3"
                     style={{
                       backgroundColor: colorMap[category.color as Color].sub,
                     }}
@@ -290,10 +315,16 @@ function TaskListRow({ task }: { task: TaskListItem }) {
             patchTask.mutate({ taskId: task.id, data: { sprintId: value } });
           }}
         >
-          <SelectTrigger className="max-h-fit w-[180px]" cell>
+          <SelectTrigger
+            className="max-h-fit focus-within:pl-0 data-[state=open]:pl-0"
+            cell
+          >
             <SelectValue placeholder="-">
               {task.sprint ? (
-                <Badge variant="secondary" className="bg-gray-200">
+                <Badge
+                  variant="secondary"
+                  className="bg-gray-200 max-w-[180px] truncate block"
+                >
                   {task.sprint.name}
                 </Badge>
               ) : (
@@ -322,13 +353,13 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         </Select>
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.createdAt ? dayjs(task.createdAt) : null}
+        <DateTimeSelect
+          value={task.createdAt ? dayjs(task.createdAt) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             patchTask.mutate({
               taskId: task.id,
-              data: { createdAt: newValue?.format() },
+              data: { createdAt: newValue },
             });
           }}
           {...(task.startDate
@@ -338,10 +369,10 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.startDate ? dayjs(task.startDate) : null}
+        <DateTimeSelect
+          value={task.startDate ? dayjs(task.startDate) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             if (!selectedDate) return;
             if (
               confirm(
@@ -353,8 +384,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               patchTaskStartDate.mutate({
                 taskId: task.id,
                 data: {
-                  date: newValue?.format() ?? null,
-                  selectedDate: selectedDate.format(),
+                  date: newValue ?? null,
                 },
               });
             }
@@ -366,16 +396,47 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        {task.endDate ? dayjs(task.endDate).format("YYYY-MM-DD") : "-"}
+        <DateTimeSelect
+          value={task.endDate ? dayjs(task.endDate) : null}
+          placeholder="-"
+          onSubmit={(newValue) => {
+            if (!selectedDate) return;
+            if (newValue) {
+              if (
+                confirm(
+                  "종료일을 변경하면 변경되는 날짜 이후의 작업 기록이 모두 사라집니다.\n 정말로 변경하시겠습니까?"
+                )
+              ) {
+                patchTaskEndDate.mutate({
+                  taskId: task.id,
+                  data: {
+                    date: newValue,
+                  },
+                });
+              }
+            } else {
+              patchTaskEndDate.mutate({
+                taskId: task.id,
+                data: {
+                  date: null,
+                },
+              });
+            }
+          }}
+          {...(task.startDate
+            ? { disabled: { before: new Date(task.startDate) } }
+            : {})}
+          cell
+        />
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.dueDate ? dayjs(task.dueDate) : null}
+        <DateTimeSelect
+          value={task.dueDate ? dayjs(task.dueDate) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             patchTask.mutate({
               taskId: task.id,
-              data: { dueDate: newValue?.format() },
+              data: { dueDate: newValue },
             });
           }}
           cell
@@ -403,7 +464,24 @@ function TaskListRow({ task }: { task: TaskListItem }) {
           }}
         />
       </TableCell>
-      <TableCell className="flex justify-center">
+      <TableCell className="flex justify-center gap-2">
+        <Button
+          size="icon"
+          variant="text"
+          onClick={() => {
+            patchTask.mutate({
+              taskId: task.id,
+              data: { bookmark: !task.bookmark },
+            });
+          }}
+        >
+          <Star
+            width={28}
+            className={cn("stroke-orange-300", {
+              "fill-amber-300": task.bookmark,
+            })}
+          />
+        </Button>
         <Button
           color="error"
           onClick={() => {

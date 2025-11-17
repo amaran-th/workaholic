@@ -17,24 +17,16 @@ export async function PATCH(
       });
 
     if (!date) {
-      await prisma.$transaction(async (tx) => {
-        // 관련된 모든 도장 삭제
-        await tx.doStamp.deleteMany({
-          where: { taskId },
-        });
-
-        // task 초기화
-        await tx.task.update({
-          where: { id: taskId },
-          data: {
-            startDate: null,
-            endDate: null,
-          },
-        });
+      // task 초기화
+      await prisma.task.update({
+        where: { id: taskId },
+        data: {
+          endDate: null,
+        },
       });
       return NextResponse.json({
         action: "reset",
-        message: "Task reset and all stamps deleted.",
+        message: "Task end date reseted",
       });
     }
 
@@ -42,31 +34,12 @@ export async function PATCH(
     await prisma.$transaction(async (tx) => {
       const task = await tx.task.findUnique({
         where: { id: taskId },
-        select: { endDate: true, createdAt: true },
+        select: { startDate: true },
       });
       if (!task) throw new Error("Task not found");
-      if (task.endDate && dayjs(date).isAfter(dayjs(task.endDate))) {
-        throw new Error("start date can't be after end date.");
+      if (task.startDate && dayjs(date).isBefore(dayjs(task.startDate))) {
+        throw new Error("end date can't be before start date.");
       }
-
-      // date보다 이전 도장 모두 삭제
-      await tx.doStamp.deleteMany({
-        where: {
-          taskId,
-          createdAt: { lt: startUTC },
-        },
-      });
-
-      // task.createdAt이 date보다 뒤라면 createdAt을 업데이트
-      await tx.task.update({
-        where: { id: taskId },
-        data: {
-          startDate: date,
-          ...(task && task.createdAt > new Date(date)
-            ? { createdAt: date }
-            : {}),
-        },
-      });
 
       // 해당 날짜에 도장 존재 여부 확인
       const existingStamp = await tx.doStamp.findFirst({
@@ -85,14 +58,29 @@ export async function PATCH(
           data: { taskId, createdAt: date },
         });
       }
+      // date보다 이후 도장 모두 삭제
+      await tx.doStamp.deleteMany({
+        where: {
+          taskId,
+          createdAt: { gt: endUTC },
+        },
+      });
+
+      await tx.task.update({
+        where: { id: taskId },
+        data: {
+          endDate: date,
+          ...(task.startDate === null ? { startDate: date } : {}),
+        },
+      });
     });
 
     return NextResponse.json({
       action: "created",
-      message: "change start date",
+      message: "change end date",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return new NextResponse("Failed to toggle stamp", { status: 500 });
+    return new NextResponse("Failed to Changing End Date", { status: 500 });
   }
 }

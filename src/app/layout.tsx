@@ -27,7 +27,7 @@ export default async function RootLayout({
       <body className="font-nanum antialiased flex flex-col min-h-svh h-full">
         <ClientLayout>
           <Header />
-          <main className="grow">{children}</main>
+          <main className="grow flex flex-col">{children}</main>
           <Footer />
         </ClientLayout>
       </body>

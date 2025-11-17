@@ -44,9 +44,9 @@ function SelectTrigger({
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "data-[size=default]:h-9 data-[size=sm]:h-8",
         cell && [
-          "pl-0 border-transparent shadow-none bg-transparent text-foreground",
-          "focus-within:pl-3 focus-within:border-border focus-within:shadow-sm focus-within:bg-background",
-          "data-[state=open]:pl-3 data-[state=open]:border-border data-[state=open]:shadow-sm data-[state=open]:bg-background",
+          "pl-0 border-transparent shadow-none bg-transparent text-foreground w-full",
+          "focus-within:pl-3 focus-within:border-border focus-within:shadow-sm focus-within:bg-transparent",
+          "data-[state=open]:pl-3 data-[state=open]:border-border data-[state=open]:shadow-sm data-[state=open]:bg-transparent",
           "transition-all duration-200",
         ],
 

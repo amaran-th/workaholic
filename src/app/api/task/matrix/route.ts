@@ -69,8 +69,8 @@ export async function GET(req: NextRequest) {
       const { taskPositions, ...rest } = task;
       return {
         ...rest,
-        positionX: taskPositions?.[0]?.positionX,
-        positionY: taskPositions?.[0]?.positionY,
+        positionX: taskPositions?.[0]?.positionX ?? null,
+        positionY: taskPositions?.[0]?.positionY ?? null,
       };
     });
 

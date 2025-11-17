@@ -1,6 +1,6 @@
 import { Handle, Position } from "@xyflow/react";
 
-function IntersectionNode({ data }: { data: any }) {
+function IntersectionNode() {
   return (
     <div className="-translate-3">
       <Handle type="target" position={Position.Left} isConnectable={false} />

@@ -12,16 +12,14 @@ model Member {
   email      String     @unique
   password   String?
   name       String?
-  centerX    Float      @default(0)
-  centerY    Float      @default(0)
   bio        String?
   avatarUrl  String?
   createdAt  DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
-  bottom     Float      @default(0)
-  left       Float      @default(0)
-  right      Float      @default(0)
-  top        Float      @default(0)
+  bottom     Float      @default(500)
+  left       Float      @default(-500)
+  right      Float      @default(500)
+  top        Float      @default(-500)
   categories Category[]
   sprints    Sprint[]
   tasks      Task[]
@@ -47,6 +45,7 @@ model Task {
   endDate       DateTime?      @db.Timestamptz(6)
   dueDate       DateTime?      @db.Timestamptz(6)
   comment       String?
+  bookmark      Boolean        @default(false)
   categoryId    String?
   memberId      String
   parentTaskId  String?
@@ -59,6 +58,7 @@ model Task {
   subTasks      Task[]         @relation("SubTasks")
   sprint        Sprint?        @relation(fields: [sprintId], references: [id])
   taskPositions TaskPosition[]
+  @@unique([memberId, no])
 }
 
 model DoStamp {
@@ -75,6 +75,8 @@ model TaskPosition {
   taskId    String
   date      String
   task      Task   @relation(fields: [taskId], references: [id])
+  
+  @@unique([taskId, date])
 }
 
 model Sprint {

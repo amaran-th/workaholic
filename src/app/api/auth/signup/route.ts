@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
       email,
       password: hashedPassword,
       name,
-      centerX: 0,
-      centerY: 0,
       left: -1000,
       right: 1000,
       top: -1000,

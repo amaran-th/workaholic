@@ -1,12 +1,8 @@
-import { HEADER_HEIGHT } from "@/lib/data";
 import { Check, Send } from "lucide-react";
 
 export default function LoginPage() {
   return (
-    <div
-      className="flex w-full items-center justify-center p-6 md:p-10"
-      style={{ minHeight: `calc(100svh - ${HEADER_HEIGHT}px)` }}
-    >
+    <div className="flex w-full items-center justify-center p-6 md:p-10 grow">
       <div className="flex flex-col gap-4 items-center">
         <Send className="size-12" />
         <p className="flex items-center gap-2 font-bold text-2xl ">

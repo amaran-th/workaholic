@@ -28,6 +28,12 @@ export async function POST(req: NextRequest) {
 
     const nextNo = (maxNo._max.no ?? 0) + 1;
 
+    const shouldCreatePosition =
+      positionX !== null &&
+      positionX !== undefined &&
+      positionY !== null &&
+      positionY !== undefined;
+
     const newTask = await prisma.task.create({
       data: {
         no: nextNo,
@@ -38,13 +44,16 @@ export async function POST(req: NextRequest) {
         categoryId,
         parentTaskId,
         sprintId,
-        taskPositions: {
-          create: {
-            positionX,
-            positionY,
-            date: date ? date : dayjs().tz("Asia/Seoul").format("YYYY-MM-DD"),
+        ...(shouldCreatePosition && {
+          taskPositions: {
+            create: {
+              positionX,
+              positionY,
+              date: date ? date : dayjs().tz("Asia/Seoul").format("YYYY-MM-DD"),
+            },
           },
-        },
+        }),
+
         ...(date ? { createdAt: dayjs(date).format() } : {}),
       },
     });
