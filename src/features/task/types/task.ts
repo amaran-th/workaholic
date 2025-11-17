@@ -31,6 +31,7 @@ export type TaskWithRelations = {
   positionX: number | null;
   positionY: number | null;
   category: Category | null;
+  bookmark: boolean;
   memberId: string;
   parentTask: { id: string; content: string } | null;
   sprint: Sprint | null;
@@ -71,6 +72,7 @@ export type PatchTaskRequest = Partial<{
   parentTaskId: string | null;
   sprintId: string | null;
   comment: string | null;
+  bookmark: boolean;
   createdAt: string;
 }>;
 

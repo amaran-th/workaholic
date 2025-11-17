@@ -45,6 +45,7 @@ model Task {
   endDate       DateTime?      @db.Timestamptz(6)
   dueDate       DateTime?      @db.Timestamptz(6)
   comment       String?
+  bookmark      Boolean        @default(false)
   categoryId    String?
   memberId      String
   parentTaskId  String?

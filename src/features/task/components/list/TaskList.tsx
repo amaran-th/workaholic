@@ -113,7 +113,7 @@ function TaskList() {
               <TableHead className="min-w-[160px]">마감 기한</TableHead>
               <TableHead className="min-w-[300px]">메모</TableHead>
               <TableHead className="min-w-[300px]">기록</TableHead>
-              <TableHead className="min-w-[100px]" />
+              <TableHead className="min-w-[120px]" />
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { Check, Pin, PinOff, RefreshCw, Trash2 } from "lucide-react";
+import { Check, Pin, PinOff, RefreshCw, Star, Trash2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -170,7 +170,12 @@ function TaskListRow({ task }: { task: TaskListItem }) {
   return (
     <TableRow
       key={task.id}
-      className="cursor-pointer hover:bg-accent transition-colors"
+      className={cn(
+        "cursor-pointer transition-all duration-200",
+        task.bookmark
+          ? "bg-amber-50 hover:bg-amber-100/60"
+          : "hover:bg-accent/20"
+      )}
       // onClick={() => console.log("Task 클릭:", task.id)}
     >
       <TableCell align="center">
@@ -181,7 +186,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         )}
       </TableCell>
       <TableCell className="text-secondary">#{task.no}</TableCell>
-      <TableCell className="font-medium truncate">
+      <TableCell className="font-medium truncate ">
         <CellInput
           defaultValue={task.content ?? ""}
           onSubmit={(value) => {
@@ -459,7 +464,24 @@ function TaskListRow({ task }: { task: TaskListItem }) {
           }}
         />
       </TableCell>
-      <TableCell className="flex justify-center">
+      <TableCell className="flex justify-center gap-2">
+        <Button
+          size="icon"
+          variant="text"
+          onClick={() => {
+            patchTask.mutate({
+              taskId: task.id,
+              data: { bookmark: !task.bookmark },
+            });
+          }}
+        >
+          <Star
+            width={28}
+            className={cn("stroke-orange-300", {
+              "fill-amber-300": task.bookmark,
+            })}
+          />
+        </Button>
         <Button
           color="error"
           onClick={() => {

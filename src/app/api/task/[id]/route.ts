@@ -17,6 +17,7 @@ export async function PATCH(
       "memo",
       "comment",
       "dueDate",
+      "bookmark",
       "categoryId",
       "sprintId",
       "parentTaskId",
