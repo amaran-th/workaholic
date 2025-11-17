@@ -1,6 +1,6 @@
 import { Badge, CategoryBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarSelect } from "@/components/ui/calendar";
+import { DateTimeSelect } from "@/components/ui/calendar";
 import { CellInput } from "@/components/ui/input";
 import {
   Popover,
@@ -353,13 +353,13 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         </Select>
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.createdAt ? dayjs(task.createdAt) : null}
+        <DateTimeSelect
+          value={task.createdAt ? dayjs(task.createdAt) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             patchTask.mutate({
               taskId: task.id,
-              data: { createdAt: newValue?.format() },
+              data: { createdAt: newValue },
             });
           }}
           {...(task.startDate
@@ -369,10 +369,10 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.startDate ? dayjs(task.startDate) : null}
+        <DateTimeSelect
+          value={task.startDate ? dayjs(task.startDate) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             if (!selectedDate) return;
             if (
               confirm(
@@ -384,7 +384,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
               patchTaskStartDate.mutate({
                 taskId: task.id,
                 data: {
-                  date: newValue?.format() ?? null,
+                  date: newValue ?? null,
                 },
               });
             }
@@ -396,10 +396,10 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.endDate ? dayjs(task.endDate) : null}
+        <DateTimeSelect
+          value={task.endDate ? dayjs(task.endDate) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             if (!selectedDate) return;
             if (newValue) {
               if (
@@ -410,7 +410,7 @@ function TaskListRow({ task }: { task: TaskListItem }) {
                 patchTaskEndDate.mutate({
                   taskId: task.id,
                   data: {
-                    date: newValue.format(),
+                    date: newValue,
                   },
                 });
               }
@@ -430,13 +430,13 @@ function TaskListRow({ task }: { task: TaskListItem }) {
         />
       </TableCell>
       <TableCell>
-        <CalendarSelect
-          selected={task.dueDate ? dayjs(task.dueDate) : null}
+        <DateTimeSelect
+          value={task.dueDate ? dayjs(task.dueDate) : null}
           placeholder="-"
-          onSelect={(newValue) => {
+          onSubmit={(newValue) => {
             patchTask.mutate({
               taskId: task.id,
-              data: { dueDate: newValue?.format() },
+              data: { dueDate: newValue },
             });
           }}
           cell

@@ -262,7 +262,7 @@ function CalendarSelect({
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col w-full max-w-36 gap-1">
+    <div className={cn("flex flex-col gap-1", { "w-full": cell })}>
       {!!label && (
         <Label htmlFor="date" className="text-xs">
           {label}
@@ -365,4 +365,67 @@ function DateTimePicker({
   );
 }
 
-export { Calendar, CalendarSelect, DateTimePicker, SingleCalendar };
+interface DateTimeSelectProps {
+  label?: string;
+  placeholder?: string;
+  readonly?: boolean;
+  cell?: boolean;
+  buttonProps?: VariantProps<typeof buttonVariants>;
+}
+
+function DateTimeSelect({
+  label,
+  placeholder,
+  readonly,
+  cell,
+  buttonProps,
+  ...props
+}: React.ComponentProps<typeof DateTimePicker> & DateTimeSelectProps) {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <div className="flex flex-col w-full gap-1">
+      {!!label && (
+        <Label htmlFor="date" className="text-xs">
+          {label}
+        </Label>
+      )}
+
+      {readonly ? (
+        <p className="text-xs text-secondary leading-8">
+          {props.value ? props.value.format("YYYY-MM-DD HH:mm") : "미정"}
+        </p>
+      ) : (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant={cell && !open ? "text" : "outline"}
+              id="date"
+              className={cn("w-full justify-between", {
+                "pl-0": cell && !open,
+              })}
+              {...buttonProps}
+              color={buttonProps?.color ?? undefined}
+            >
+              {props.value
+                ? props.value.format("YYYY-MM-DD HH:mm")
+                : placeholder ?? "날짜 선택"}
+              {(!cell || open) && <ChevronDownIcon />}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+            <DateTimePicker {...props} />
+          </PopoverContent>
+        </Popover>
+      )}
+    </div>
+  );
+}
+
+export {
+  Calendar,
+  CalendarSelect,
+  DateTimePicker,
+  DateTimeSelect,
+  SingleCalendar,
+};
