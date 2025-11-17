@@ -38,8 +38,9 @@ function TaskStorage() {
     <>
       <div
         className={cn(
-          "shrink-0 index-10 border-r-2 border-color-secondary h-full bg-gray-100 transition-all relative",
-          open ? "w-[250px]" : "w-0"
+          "shrink-0 index-10 border-r-2 h-full bg-gray-100 transition-all relative",
+          open ? "w-[250px]" : "w-0",
+          { "border-amber-300": notLocatedTasks.length }
         )}
       >
         <div
@@ -77,7 +78,12 @@ function TaskStorage() {
           )}
         </div>
         <div
-          className="absolute index-[11] -right-[26px] top-0 bottom-0 my-auto bg-white border-2 border-l-0 border-color-secondary rounded-r-md h-30 flex items-center transition-colors text-secondary hover:bg-gray-50"
+          className={cn(
+            "absolute index-[11] -right-[26px] top-0 bottom-0 my-auto border-2 border-l-0 rounded-r-md h-30 flex items-center transition-colors",
+            notLocatedTasks.length
+              ? "bg-amber-50 text-amber-300 hover:bg-amber-100 border-amber-300"
+              : "text-secondary hover:bg-gray-50 bg-white"
+          )}
           onClick={() => {
             console.log(open);
             setOpen((prev) => !prev);
