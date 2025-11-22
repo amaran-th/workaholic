@@ -12,14 +12,16 @@ export default async function Header() {
   const session = await getServerUser();
   return (
     <div
-      className={cn("bg-black text-white flex p-2 items-center gap-4")}
+      className={cn(
+        "bg-black text-white flex p-2 justify-between items-center gap-4"
+      )}
       style={{ height: HEADER_HEIGHT }}
     >
       <div className="">
         <Link href="/">일을:하자</Link>
       </div>
-      <div className="flex-1 rounded-3xl bg-gray-600 p-1 px-4">광고</div>
-      <div className="">
+
+      <div>
         {session ? (
           <div className="flex gap-1">
             <NavigationButton />
