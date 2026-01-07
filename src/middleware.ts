@@ -12,6 +12,7 @@ export async function middleware(req: NextRequest) {
     "/login",
     "/signup",
   ];
+  const isApiPath = pathname.startsWith("/api");
   if (excludePaths.some((path) => pathname.startsWith(path))) {
     return res;
   }
@@ -31,6 +32,9 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!token) {
+    if (isApiPath) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -40,6 +44,9 @@ export async function middleware(req: NextRequest) {
   } = await supabaseServer.auth.getUser(token);
 
   if (!user || error) {
+    if (isApiPath) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

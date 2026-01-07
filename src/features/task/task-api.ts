@@ -3,6 +3,7 @@
 import { toQueryString } from "@/lib/utils/queryString";
 import { Task } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { assertOk } from "@/lib/utils/http";
 import {
   PatchTaskRequest,
   PostTaskRequest,
@@ -16,7 +17,7 @@ const API_BASE = "/api/task";
 const getMatrixTasksApi = async (params: TaskFilter) => {
   const queryString = toQueryString(params);
   const res = await fetch(`${API_BASE}/matrix${queryString}`);
-  if (!res.ok) throw new Error("Task 불러오기 실패");
+  assertOk(res, "Task 불러오기 실패");
   return res.json();
 };
 
@@ -33,7 +34,7 @@ export const useGetMatrixTasksQuery = (
 const getListTasksApi = async (params: TaskFilter) => {
   const queryString = toQueryString(params);
   const res = await fetch(`${API_BASE}/list${queryString}`);
-  if (!res.ok) throw new Error("리스트 뷰 Task 불러오기 실패");
+  assertOk(res, "리스트 뷰 Task 불러오기 실패");
   return res.json();
 };
 
@@ -57,6 +58,7 @@ export const postTaskApi = async (
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
+    assertOk(res, "Task 생성 실패");
     return res.json();
   } catch (err: any) {
     if (retry > 0 && err.code === "P2002") {
@@ -78,7 +80,7 @@ export const patchTaskApi = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Task 수정 실패");
+  assertOk(res, "Task 수정 실패");
   return res.json();
 };
 
@@ -94,7 +96,7 @@ export const patchTaskStartDateApi = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Task 시작일 수정 실패");
+  assertOk(res, "Task 시작일 수정 실패");
   return res.json();
 };
 
@@ -110,7 +112,7 @@ export const patchTaskEndDateApi = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Task 종료일 수정 실패");
+  assertOk(res, "Task 종료일 수정 실패");
   return res.json();
 };
 
@@ -126,7 +128,7 @@ export const patchTaskPositionApi = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Task 위치 수정 실패");
+  assertOk(res, "Task 위치 수정 실패");
   return res.json();
 };
 
@@ -135,7 +137,7 @@ export const deleteTaskApi = async ({ taskId }: { taskId: string }) => {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
   });
-  if (!res.ok) throw new Error("Task 삭제 실패");
+  assertOk(res, "Task 삭제 실패");
   return res.json();
 };
 
@@ -151,7 +153,7 @@ export const toggleDoingStamp = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),
   });
-  if (!res.ok) throw new Error("stamp 실패");
+  assertOk(res, "stamp 실패");
   return res.json();
 };
 
@@ -167,6 +169,6 @@ export const toggleCompleteStamp = async ({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),
   });
-  if (!res.ok) throw new Error("complete 실패");
+  assertOk(res, "complete 실패");
   return res.json();
 };

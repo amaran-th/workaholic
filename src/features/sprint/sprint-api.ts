@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { assertOk } from "@/lib/utils/http";
 import { PostSprintRequest, Sprint } from "./types/sprint";
 
 const API_BASE = "/api/sprint";
@@ -9,7 +10,7 @@ const getSprintApi = async (params: {
   categoryId?: string | null;
 }): Promise<Sprint[]> => {
   const res = await fetch(`${API_BASE}?categoryId=${params.categoryId}`);
-  if (!res.ok) throw new Error("스프린트 목록 불러오기 실패");
+  assertOk(res, "스프린트 목록 불러오기 실패");
   return res.json();
 };
 
@@ -26,7 +27,7 @@ export async function postSprintApi(data: PostSprintRequest): Promise<Sprint> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("스프린트 생성 실패");
+  assertOk(res, "스프린트 생성 실패");
   return res.json();
 }
 
@@ -42,12 +43,13 @@ export async function patchSprintApi({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("스프린트 업데이트 실패");
+  assertOk(res, "스프린트 업데이트 실패");
   return res.json();
 }
 
 export async function deleteSprintApi({ id }: { id: string }): Promise<void> {
-  const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-
-  if (!res.ok) throw new Error("스프린트 삭제 실패");
+  const res = await fetch(`${API_BASE}/${id}`, {
+    method: "DELETE",
+  });
+  assertOk(res, "스프린트 삭제 실패");
 }
