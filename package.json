@@ -1,6 +1,6 @@
 {
   "name": "workaholic",
-  "version": "1.003.0",
+  "version": "1.003.1",
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.development -- next dev -p 3000",
