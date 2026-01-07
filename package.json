@@ -1,6 +1,6 @@
 {
   "name": "workaholic",
-  "version": "1.003.0",
+  "version": "1.003.1",
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.development -- next dev -p 3000",
@@ -32,10 +32,10 @@
     "jotai": "^2.14.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.544.0",
-    "next": "15.5.3",
-    "react": "19.1.0",
+    "next": "^15.5.9",
+    "react": "^19.2.3",
     "react-day-picker": "^9.11.0",
-    "react-dom": "19.1.0",
+    "react-dom": "^19.2.3",
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.3.1"
   },
