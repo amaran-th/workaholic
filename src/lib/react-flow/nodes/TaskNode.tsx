@@ -105,7 +105,9 @@ function CategorySprintSelector({ task }: { task: TaskWithRelations }) {
           }}
         >
           <SelectTrigger className="max-h-fit w-full">
-            <SelectValue placeholder="카테고리 선택" />
+            <SelectValue placeholder="카테고리 선택">
+              {task.category ? task.category.name : ""}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <div className="flex justify-between">
