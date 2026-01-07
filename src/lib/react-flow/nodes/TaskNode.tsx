@@ -574,7 +574,7 @@ function TaskNode({ data }: { data: TaskWithRelations }) {
             <FlexibleTextArea
               text={memo}
               setText={setMemo}
-              debounceCallback={(e) => {
+              onBlur={(e) => {
                 patchTask.mutate({
                   taskId: data.id,
                   data: { memo: e.target.value },

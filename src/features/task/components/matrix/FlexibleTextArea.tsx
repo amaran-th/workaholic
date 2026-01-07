@@ -1,8 +1,8 @@
-import { debounceOnChange } from "@/lib/utils/debounceOnChange";
 import { cn } from "@/lib/utils/utils";
 import {
   ChangeEvent,
   Dispatch,
+  FocusEvent,
   SetStateAction,
   TextareaHTMLAttributes,
   useEffect,
@@ -13,12 +13,12 @@ function FlexibleTextArea({
   text,
   setText,
   className,
-  debounceCallback,
+  onBlur,
   ...props
 }: TextareaHTMLAttributes<HTMLTextAreaElement> & {
   text: string;
   setText: Dispatch<SetStateAction<string>>;
-  debounceCallback?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  onBlurCommit?: (e: FocusEvent<HTMLTextAreaElement>) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -30,10 +30,11 @@ function FlexibleTextArea({
       const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = scrollHeight + "px";
     }
-    if (debounceCallback) {
-      debounceOnChange(() => {
-        debounceCallback(e);
-      });
+  };
+
+  const handleBlur = (e: FocusEvent<HTMLTextAreaElement>) => {
+    if (onBlur) {
+      onBlur(e);
     }
   };
   useEffect(() => {
@@ -46,6 +47,7 @@ function FlexibleTextArea({
     <textarea
       ref={textareaRef}
       onChange={handleChange}
+      onBlur={handleBlur}
       onDragStartCapture={(e) => e.stopPropagation()}
       onMouseDownCapture={(e) => e.stopPropagation()}
       className={cn(
