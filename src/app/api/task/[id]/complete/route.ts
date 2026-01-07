@@ -51,6 +51,7 @@ export async function POST(
         updatedTask = await tx.task.update({
           where: { id: taskId },
           data: {
+            startDate: task.startDate || date,
             endDate: date,
           },
         });
