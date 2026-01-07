@@ -323,7 +323,14 @@ function DateTimePicker({
   }, [value]);
 
   return (
-    <div className="p-2">
+    <div
+      className="p-2"
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft") {
+          event.stopPropagation();
+        }
+      }}
+    >
       <SingleCalendar
         {...props}
         selected={dayjs(date)}

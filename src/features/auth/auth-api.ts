@@ -1,13 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { assertOk } from "@/lib/utils/http";
 import { MemberSession } from "./types/auth";
 
 const API_BASE = "/api/auth";
 
 const getSessionApi = async () => {
   const res = await fetch(`${API_BASE}/session`);
-  if (!res.ok) throw new Error("세션 불러오기 실패");
+  assertOk(res, "세션 불러오기 실패");
   return res.json();
 };
 
@@ -31,7 +32,7 @@ export const loginMemberApi = async (params: {
     body: JSON.stringify(params),
   });
 
-  if (!res.ok) throw new Error("로그인 실패");
+  assertOk(res, "로그인 실패");
   return res.json();
 };
 
@@ -40,7 +41,7 @@ export const logoutMemberApi = async () => {
     method: "POST",
   });
 
-  if (!res.ok) throw new Error("로그아웃 실패");
+  assertOk(res, "로그아웃 실패");
   return res.json();
 };
 
@@ -55,5 +56,5 @@ export const postMemberApi = async (params: {
     body: JSON.stringify(params),
   });
 
-  if (!res.ok) throw new Error("회원가입 실패");
+  assertOk(res, "회원가입 실패");
 };

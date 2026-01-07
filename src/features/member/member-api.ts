@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { assertOk } from "@/lib/utils/http";
 import {
   MemberInfo,
   MemberInfoPatchRequest,
@@ -11,7 +12,7 @@ const API_BASE = "/api/member";
 
 const getMemberInfoApi = async () => {
   const res = await fetch(API_BASE);
-  if (!res.ok) throw new Error("회원 정보 불러오기 실패");
+  assertOk(res, "회원 정보 불러오기 실패");
   return res.json();
 };
 
@@ -23,7 +24,7 @@ export const useGetInfoQuery = () =>
 
 const getCenterPositionApi = async () => {
   const res = await fetch(`${API_BASE}/position`);
-  if (!res.ok) throw new Error("중심 좌표 불러오기 실패");
+  assertOk(res, "중심 좌표 불러오기 실패");
   return res.json();
 };
 
@@ -50,7 +51,7 @@ export async function patchPositionApi({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ left, right, top, bottom }),
   });
-  if (!res.ok) throw new Error("센터 포지션 업데이트 실패");
+  assertOk(res, "센터 포지션 업데이트 실패");
   return res.json();
 }
 
@@ -64,6 +65,6 @@ export async function patchMemberInfoApi({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("멤버 정보 업데이트 실패");
+  assertOk(res, "멤버 정보 업데이트 실패");
   return res.json();
 }

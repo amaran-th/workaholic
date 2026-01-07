@@ -90,7 +90,7 @@ function TaskCard({
       <FlexibleTextArea
         text={text}
         setText={setText}
-        debounceCallback={(e) => {
+        onBlur={(e) => {
           patchTask.mutate({
             taskId: data.id,
             data: { content: e.target.value },
